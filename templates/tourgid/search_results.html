@@ -1,0 +1,325 @@
+{% extends "tourgid/base.html" %}
+
+{% block title %}Search Results - TourGid{% endblock %}
+
+{% block content %}
+<!-- Search Results Header -->
+<div class="relative">
+    <div class="w-full h-[200px] rounded-xl overflow-hidden shadow-lg">
+        <div class="absolute inset-0 bg-gradient-to-r from-primary-900/90 to-primary-700/70 z-10"></div>
+        <img src="https://images.unsplash.com/photo-1488085061387-422e29b40080?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Search results" class="absolute inset-0 w-full h-full object-cover">
+        <div class="absolute inset-0 flex flex-col justify-center p-6 z-20">
+            <div class="max-w-6xl mx-auto w-full">
+                <h1 class="text-2xl md:text-4xl font-bold text-white mb-2">Search Results: "{{ query }}"</h1>
+                <p class="text-lg text-white/90 max-w-2xl">Explore what we've found for you</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search Form -->
+<div class="max-w-6xl mx-auto -mt-8 bg-white rounded-xl shadow-lg p-6 relative z-20 mb-10">
+    <form method="GET" action="{% url 'search' %}" class="flex flex-col md:flex-row gap-3 md:items-end">
+        <div class="flex-grow">
+            <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" id="search" name="q" value="{{ query }}" 
+                    placeholder="Destinations, hotels, attractions..." 
+                    class="w-full pl-10 py-3 px-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+            </div>
+        </div>
+        <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center shadow-sm hover:shadow-md">
+            <i class="fas fa-search mr-2"></i> Search
+        </button>
+    </form>
+</div>
+
+<!-- Results Summary -->
+<div class="max-w-6xl mx-auto mb-8">
+    <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
+        <p class="text-gray-600">
+            <span class="font-semibold text-primary-600">{{ total_results }}</span> results found for "{{ query }}" across destinations, hotels, attractions, and excursions.
+        </p>
+    </div>
+</div>
+
+<!-- No Results Message -->
+{% if total_results == 0 %}
+<div class="max-w-6xl mx-auto my-16 text-center">
+    <div class="bg-primary-50 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+        <i class="fas fa-search text-4xl text-primary-400"></i>
+    </div>
+    <h3 class="text-2xl font-semibold text-gray-800 mb-2">No Results Found</h3>
+    <p class="text-gray-600 mb-8 max-w-md mx-auto">We couldn't find any matches for "{{ query }}". Try checking your spelling or using more general terms.</p>
+    <a href="{% url 'home' %}" class="inline-flex items-center text-primary-600 hover:text-primary-800 font-medium">
+        <i class="fas fa-arrow-left mr-2"></i> Back to Home
+    </a>
+</div>
+{% else %}
+
+<!-- Destinations Section -->
+{% if destinations %}
+<div class="max-w-6xl mx-auto mb-12">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Destinations</h2>
+        {% if destinations.count > 3 %}
+        <a href="{% url 'destinations' %}?search={{ query }}" class="text-primary-600 hover:text-primary-800 font-medium text-sm flex items-center">
+            View all {{ destinations.count }} <i class="fas fa-chevron-right ml-1"></i>
+        </a>
+        {% endif %}
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for destination in destinations|slice:":3" %}
+        <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition duration-300 overflow-hidden group">
+            <div class="relative h-48">
+                {% if destination.image %}
+                <img src="{{ destination.image.url }}" alt="{{ destination.name }}" class="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-500">
+                {% else %}
+                <div class="absolute inset-0 bg-gradient-to-r from-primary-400 to-primary-600 flex items-center justify-center">
+                    <i class="fas fa-globe-americas text-4xl text-white"></i>
+                </div>
+                {% endif %}
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                <div class="absolute bottom-0 left-0 p-4 w-full">
+                    <span class="inline-flex items-center bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm mb-2">
+                        {{ destination.continent }}
+                    </span>
+                    <h3 class="text-xl font-bold text-white">{{ destination.name }}, {{ destination.country }}</h3>
+                </div>
+            </div>
+            <div class="p-5">
+                <p class="text-gray-600 mb-4 line-clamp-2">{{ destination.description|truncatechars:120 }}</p>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <span class="text-xs text-gray-500">{{ destination.hotels.count }} Hotels</span>
+                        <span class="mx-2 text-gray-300">•</span>
+                        <span class="text-xs text-gray-500">{{ destination.attractions.count }} Attractions</span>
+                    </div>
+                    <a href="{% url 'destination_detail' destination.id %}" class="text-primary-600 hover:text-primary-800 text-sm font-medium">
+                        Explore
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Hotels Section -->
+{% if hotels %}
+<div class="max-w-6xl mx-auto mb-12">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Hotels</h2>
+        {% if hotels.count > 3 %}
+        <a href="{% url 'hotels' %}?search={{ query }}" class="text-primary-600 hover:text-primary-800 font-medium text-sm flex items-center">
+            View all {{ hotels.count }} <i class="fas fa-chevron-right ml-1"></i>
+        </a>
+        {% endif %}
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for hotel in hotels|slice:":3" %}
+        <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition duration-300 overflow-hidden group">
+            <div class="relative h-48">
+                {% if hotel.image %}
+                <img src="{{ hotel.image.url }}" alt="{{ hotel.name }}" class="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-500">
+                {% else %}
+                <div class="absolute inset-0 bg-gradient-to-r from-primary-400 to-primary-600 flex items-center justify-center">
+                    <i class="fas fa-hotel text-4xl text-white"></i>
+                </div>
+                {% endif %}
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                <div class="absolute top-3 right-3">
+                    <div class="flex">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= hotel.star_rating %}
+                            <i class="fas fa-star text-yellow-400 text-xs"></i>
+                            {% else %}
+                            <i class="far fa-star text-yellow-400 text-xs"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="absolute bottom-0 left-0 p-4 w-full">
+                    <span class="inline-flex items-center bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm mb-2">
+                        <i class="fas fa-map-marker-alt mr-1"></i> {{ hotel.destination.name }}
+                    </span>
+                    <h3 class="text-xl font-bold text-white">{{ hotel.name }}</h3>
+                </div>
+            </div>
+            <div class="p-5">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="font-semibold text-primary-600">${{ hotel.price_per_night }} <span class="text-gray-500 text-sm font-normal">/ night</span></span>
+                    {% if hotel.rating %}
+                    <div class="flex items-center bg-primary-50 px-2 py-1 rounded-md">
+                        <span class="text-sm font-medium text-primary-700 mr-1">{{ hotel.rating }}</span>
+                        <i class="fas fa-star text-primary-600 text-xs"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <p class="text-gray-600 mb-4 line-clamp-2">{{ hotel.description|truncatechars:100 }}</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    {% if hotel.amenities.wifi %}
+                    <span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full flex items-center">
+                        <i class="fas fa-wifi mr-1"></i> WiFi
+                    </span>
+                    {% endif %}
+                    {% if hotel.amenities.pool %}
+                    <span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full flex items-center">
+                        <i class="fas fa-swimming-pool mr-1"></i> Pool
+                    </span>
+                    {% endif %}
+                    {% if hotel.amenities.spa %}
+                    <span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full flex items-center">
+                        <i class="fas fa-spa mr-1"></i> Spa
+                    </span>
+                    {% endif %}
+                </div>
+                <a href="{% url 'hotel_detail' hotel.id %}" class="block text-center bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-lg transition duration-300 shadow-sm hover:shadow mt-2">
+                    View Details
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Attractions Section -->
+{% if attractions %}
+<div class="max-w-6xl mx-auto mb-12">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Attractions</h2>
+        {% if attractions.count > 3 %}
+        <a href="{% url 'attractions' %}?search={{ query }}" class="text-primary-600 hover:text-primary-800 font-medium text-sm flex items-center">
+            View all {{ attractions.count }} <i class="fas fa-chevron-right ml-1"></i>
+        </a>
+        {% endif %}
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for attraction in attractions|slice:":3" %}
+        <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition duration-300 overflow-hidden group">
+            <div class="relative h-48">
+                {% if attraction.image %}
+                <img src="{{ attraction.image.url }}" alt="{{ attraction.name }}" class="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-500">
+                {% else %}
+                <div class="absolute inset-0 bg-gradient-to-r from-primary-400 to-primary-600 flex items-center justify-center">
+                    <i class="fas fa-camera text-4xl text-white"></i>
+                </div>
+                {% endif %}
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                <div class="absolute bottom-0 left-0 p-4 w-full">
+                    <span class="inline-flex items-center bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm mb-2">
+                        {{ attraction.category }}
+                    </span>
+                    <h3 class="text-xl font-bold text-white">{{ attraction.name }}</h3>
+                </div>
+            </div>
+            <div class="p-5">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center">
+                        <i class="fas fa-map-marker-alt text-primary-500 mr-1"></i>
+                        <span class="text-sm text-gray-600">{{ attraction.destination.name }}</span>
+                    </div>
+                    {% if attraction.ticket_price > 0 %}
+                    <span class="font-semibold text-primary-600">${{ attraction.ticket_price }}</span>
+                    {% else %}
+                    <span class="font-semibold text-green-600">Free Entry</span>
+                    {% endif %}
+                </div>
+                <p class="text-gray-600 mb-4 line-clamp-2">{{ attraction.description|truncatechars:100 }}</p>
+                <a href="{% url 'attraction_detail' attraction.id %}" class="block text-center bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-lg transition duration-300 shadow-sm hover:shadow mt-2">
+                    View Details
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Excursions Section -->
+{% if excursions %}
+<div class="max-w-6xl mx-auto mb-12">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Excursions</h2>
+        {% if excursions.count > 3 %}
+        <a href="{% url 'excursions' %}?search={{ query }}" class="text-primary-600 hover:text-primary-800 font-medium text-sm flex items-center">
+            View all {{ excursions.count }} <i class="fas fa-chevron-right ml-1"></i>
+        </a>
+        {% endif %}
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for excursion in excursions|slice:":3" %}
+        <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition duration-300 overflow-hidden group">
+            <div class="relative h-48">
+                {% if excursion.image %}
+                <img src="{{ excursion.image.url }}" alt="{{ excursion.name }}" class="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-500">
+                {% else %}
+                <div class="absolute inset-0 bg-gradient-to-r from-primary-400 to-primary-600 flex items-center justify-center">
+                    <i class="fas fa-hiking text-4xl text-white"></i>
+                </div>
+                {% endif %}
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                <div class="absolute bottom-0 left-0 p-4 w-full">
+                    <span class="inline-flex items-center bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm mb-2">
+                        {{ excursion.get_excursion_type_display }}
+                    </span>
+                    <h3 class="text-xl font-bold text-white">{{ excursion.name }}</h3>
+                </div>
+            </div>
+            <div class="p-5">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center">
+                        <i class="fas fa-map-marker-alt text-primary-500 mr-1"></i>
+                        <span class="text-sm text-gray-600">{{ excursion.destination.name }}</span>
+                    </div>
+                    <span class="font-semibold text-primary-600">${{ excursion.price }}</span>
+                </div>
+                <p class="text-gray-600 mb-4 line-clamp-2">{{ excursion.description|truncatechars:100 }}</p>
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center text-sm text-gray-500">
+                        <i class="fas fa-clock text-primary-500 mr-1"></i>
+                        {{ excursion.duration }}
+                    </div>
+                    {% if excursion.rating %}
+                    <div class="flex items-center">
+                        <span class="text-sm font-medium mr-1">{{ excursion.rating }}</span>
+                        <i class="fas fa-star text-yellow-400 text-sm"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <a href="{% url 'excursion_detail' excursion.id %}" class="block text-center bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-lg transition duration-300 shadow-sm hover:shadow">
+                    View Details
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Related Searches -->
+<div class="max-w-6xl mx-auto mb-16">
+    <div class="bg-gray-50 p-6 rounded-xl border border-gray-100">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Related Searches</h2>
+        <div class="flex flex-wrap gap-2">
+            {% for term in related_searches %}
+            <a href="{% url 'search' %}?q={{ term }}" class="bg-white px-4 py-2 rounded-full text-gray-600 text-sm border border-gray-200 hover:bg-primary-50 hover:text-primary-600 hover:border-primary-200 transition duration-300">
+                {{ term }}
+            </a>
+            {% empty %}
+            <p class="text-gray-500 text-sm">No related searches available</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %} 

@@ -1,0 +1,176 @@
+{% extends "tourgid/base.html" %}
+
+{% block title %}My Bookings - TourGid{% endblock %}
+
+{% block content %}
+<!-- Bookings Header -->
+<div class="relative mb-10">
+    <div class="w-full h-60 rounded-2xl overflow-hidden shadow-xl">
+        <div class="absolute inset-0 bg-gradient-to-r from-primary-900/90 to-primary-700/70 z-10"></div>
+        <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3" alt="Bookings background" class="absolute inset-0 w-full h-full object-cover">
+        <div class="absolute inset-0 flex items-center justify-center text-center p-6 z-20">
+            <div class="max-w-4xl">
+                <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">My Bookings</h1>
+                <p class="text-lg text-white max-w-2xl mx-auto">View, manage and track all your travel arrangements in one place.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bookings Content -->
+<div class="max-w-5xl mx-auto">
+    <!-- Filters and Search -->
+    <div class="mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center space-x-4">
+            <button class="bg-primary-600 text-white px-4 py-2 rounded-lg">Upcoming</button>
+            <button class="bg-white text-gray-700 px-4 py-2 rounded-lg shadow-sm">Past</button>
+            <button class="bg-white text-gray-700 px-4 py-2 rounded-lg shadow-sm">Cancelled</button>
+        </div>
+        
+        <div class="relative">
+            <input type="text" placeholder="Search bookings..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-300 focus:border-primary-400 focus:outline-none">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <i class="fas fa-search"></i>
+            </span>
+        </div>
+    </div>
+    
+    {% if bookings %}
+    <!-- Bookings List -->
+    <div class="space-y-6">
+        {% for booking in bookings %}
+        <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
+            <div class="flex flex-col md:flex-row justify-between">
+                <!-- Booking Info -->
+                <div class="flex-1">
+                    {% if booking.hotel %}
+                    <div class="flex items-start">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
+                            {% if booking.hotel.image %}
+                            <img src="{{ booking.hotel.image.url }}" alt="{{ booking.hotel.name }}" class="w-full h-full object-cover">
+                            {% else %}
+                            <div class="w-full h-full bg-primary-100 flex items-center justify-center">
+                                <i class="fas fa-hotel text-primary-500 text-2xl"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="ml-4">
+                            <div class="flex items-center">
+                                <span class="bg-secondary-100 text-secondary-800 text-xs px-2 py-1 rounded-full">Hotel</span>
+                                <span class="ml-2 text-sm text-gray-500">Booking #{{ booking.booking_reference }}</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-800 mt-1">{{ booking.hotel.name }}</h3>
+                            <p class="text-sm text-gray-600 mt-1">
+                                <i class="fas fa-map-marker-alt text-primary-500 mr-1"></i>
+                                {{ booking.hotel.destination.name }}, {{ booking.hotel.destination.country }}
+                            </p>
+                            <div class="mt-3 flex items-center text-sm">
+                                <div class="bg-primary-50 text-primary-700 px-3 py-1 rounded-full flex items-center">
+                                    <i class="far fa-calendar-alt mr-1"></i>
+                                    {{ booking.check_in_date|date:"M d, Y" }} - {{ booking.check_out_date|date:"M d, Y" }}
+                                </div>
+                                <div class="ml-3 bg-primary-50 text-primary-700 px-3 py-1 rounded-full flex items-center">
+                                    <i class="fas fa-users mr-1"></i>
+                                    {{ booking.adults }} Adults{% if booking.children %}, {{ booking.children }} Children{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% elif booking.excursion %}
+                    <div class="flex items-start">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
+                            {% if booking.excursion.image %}
+                            <img src="{{ booking.excursion.image.url }}" alt="{{ booking.excursion.name }}" class="w-full h-full object-cover">
+                            {% else %}
+                            <div class="w-full h-full bg-primary-100 flex items-center justify-center">
+                                <i class="fas fa-hiking text-primary-500 text-2xl"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="ml-4">
+                            <div class="flex items-center">
+                                <span class="bg-accent-100 text-accent-800 text-xs px-2 py-1 rounded-full">Excursion</span>
+                                <span class="ml-2 text-sm text-gray-500">Booking #{{ booking.booking_reference }}</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-800 mt-1">{{ booking.excursion.name }}</h3>
+                            <p class="text-sm text-gray-600 mt-1">
+                                <i class="fas fa-map-marker-alt text-primary-500 mr-1"></i>
+                                {{ booking.excursion.destination.name }}, {{ booking.excursion.destination.country }}
+                            </p>
+                            <div class="mt-3 flex items-center text-sm">
+                                <div class="bg-primary-50 text-primary-700 px-3 py-1 rounded-full flex items-center">
+                                    <i class="far fa-calendar-alt mr-1"></i>
+                                    {{ booking.excursion_date|date:"M d, Y H:i" }}
+                                </div>
+                                <div class="ml-3 bg-primary-50 text-primary-700 px-3 py-1 rounded-full flex items-center">
+                                    <i class="fas fa-users mr-1"></i>
+                                    {{ booking.adults }} Adults{% if booking.children %}, {{ booking.children }} Children{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Status and Actions -->
+                <div class="mt-4 md:mt-0 md:ml-4 flex flex-col items-end space-y-3">
+                    <div class="flex items-center">
+                        {% if booking.status == 'pending' %}
+                        <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">Pending</span>
+                        {% elif booking.status == 'confirmed' %}
+                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Confirmed</span>
+                        {% elif booking.status == 'cancelled' %}
+                        <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">Cancelled</span>
+                        {% elif booking.status == 'completed' %}
+                        <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">Completed</span>
+                        {% endif %}
+                    </div>
+                    
+                    <span class="text-2xl font-bold text-primary-600">${{ booking.total_price }}</span>
+                    
+                    <div class="flex space-x-2">
+                        <button class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm">View Details</button>
+                        {% if booking.status == 'pending' or booking.status == 'confirmed' %}
+                        <button class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-50">Cancel</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    <div class="mt-8 flex justify-center">
+        <nav class="flex items-center space-x-2">
+            <a href="#" class="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">
+                <i class="fas fa-chevron-left text-sm"></i>
+            </a>
+            <a href="#" class="px-4 py-2 rounded-lg bg-primary-600 text-white">1</a>
+            <a href="#" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">2</a>
+            <a href="#" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">3</a>
+            <a href="#" class="px-3 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">
+                <i class="fas fa-chevron-right text-sm"></i>
+            </a>
+        </nav>
+    </div>
+    {% else %}
+    <!-- No Bookings State -->
+    <div class="bg-white rounded-xl shadow-sm p-12 text-center">
+        <div class="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-calendar-xmark text-primary-500 text-3xl"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">No Bookings Yet</h3>
+        <p class="text-gray-600 mb-6 max-w-md mx-auto">You haven't made any bookings yet. Explore destinations, hotels, and excursions to plan your next adventure!</p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <a href="{% url 'hotels' %}" class="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-medium">
+                <i class="fas fa-hotel mr-2"></i> Browse Hotels
+            </a>
+            <a href="{% url 'excursions' %}" class="bg-secondary-500 hover:bg-secondary-600 text-white px-6 py-3 rounded-lg font-medium">
+                <i class="fas fa-hiking mr-2"></i> Browse Excursions
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

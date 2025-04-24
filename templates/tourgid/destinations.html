@@ -1,0 +1,388 @@
+{% extends "tourgid/base.html" %}
+
+{% block title %}Destinations - TourGid{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative bg-gradient-to-r from-primary-700 to-primary-900 py-16">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="max-w-3xl">
+            <h1 class="text-4xl font-bold text-white mb-4">Discover Extraordinary Destinations</h1>
+            <p class="text-xl text-white/80 mb-6">Explore breathtaking locations, from sun-soaked beaches to snow-capped mountains and vibrant cities.</p>
+            
+            <!-- Search -->
+            <div class="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20">
+                <form action="{% url 'search' %}" method="GET" class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-grow">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <i class="fas fa-search text-white/60"></i>
+                            </div>
+                            <input type="text" name="q" placeholder="Where do you want to go?" class="w-full bg-transparent border border-white/30 text-white placeholder-white/60 rounded-lg pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-white/50">
+                        </div>
+                    </div>
+                    <button type="submit" class="bg-white text-primary-700 hover:bg-primary-50 font-medium px-6 py-3 rounded-lg shadow-md transition-all">
+                        <i class="fas fa-paper-plane mr-2"></i> Search
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Decorative elements -->
+    <div class="absolute right-10 top-10 text-white/10 text-9xl">
+        <i class="fas fa-globe-americas"></i>
+    </div>
+    <div class="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-white to-transparent"></div>
+</section>
+
+<!-- Filter Section -->
+<section class="bg-white py-8 shadow-sm sticky top-16 z-40">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="flex flex-wrap gap-3">
+                <div class="relative">
+                    <select id="country-filter" class="appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2 pl-4 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                        <option value="">All Countries</option>
+                        {% for country in countries %}
+                        <option value="{{ country }}">{{ country }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </div>
+                </div>
+                
+                <div class="relative">
+                    <select id="climate-filter" class="appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2 pl-4 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                        <option value="">All Climates</option>
+                        {% for climate in climates %}
+                        <option value="{{ climate }}">{{ climate }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </div>
+                </div>
+                
+                <div class="relative">
+                    <select id="vacation-type-filter" class="appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2 pl-4 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                        <option value="">All Vacation Types</option>
+                        {% for vacation_type in vacation_types %}
+                        <option value="{{ vacation_type }}">{{ vacation_type }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <span class="text-sm text-gray-600">Sort by:</span>
+                <div class="relative">
+                    <select id="sort-filter" class="appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2 pl-4 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                        <option value="name">Name</option>
+                        <option value="rating">Rating</option>
+                        <option value="popularity">Popularity</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </div>
+                </div>
+                
+                <div class="flex border border-gray-200 rounded-lg overflow-hidden">
+                    <button id="view-grid" class="px-3 py-2 bg-primary-50 text-primary-600 hover:bg-primary-100">
+                        <i class="fas fa-th"></i>
+                    </button>
+                    <button id="view-list" class="px-3 py-2 bg-gray-50 text-gray-600 hover:bg-gray-100">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Destinations Grid -->
+<section class="py-12">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mb-8 flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-gray-900">All Destinations</h2>
+            <p class="text-gray-600">Showing <span id="destination-count">{{ destinations|length }}</span> destinations</p>
+        </div>
+        
+        <!-- Grid View (default) -->
+        <div id="grid-view" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {% for destination in destinations %}
+            <div class="destination-card bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all card-hover group" 
+                 data-country="{{ destination.country }}" 
+                 data-climate="{{ destination.climate }}" 
+                 data-vacation-type="{{ destination.vacation_type }}">
+                <div class="relative h-64 overflow-hidden">
+                    {% if destination.image %}
+                    <img src="{{ destination.image.url }}" alt="{{ destination.name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out">
+                    {% else %}
+                    <div class="w-full h-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
+                        <i class="fas fa-mountain text-5xl text-white"></i>
+                    </div>
+                    {% endif %}
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-60"></div>
+                    
+                    {% if destination.vacation_type %}
+                    <div class="absolute top-4 right-4">
+                        <span class="bg-secondary-500 text-white text-xs font-medium px-2.5 py-1 rounded-full">{{ destination.vacation_type }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if destination.featured %}
+                    <div class="absolute top-4 left-4">
+                        <span class="bg-primary-500 text-white text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                            <i class="fas fa-star mr-1"></i> Featured
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="p-6">
+                    <p class="text-gray-700 flex items-center text-sm mb-3">
+                        <i class="fas fa-map-marker-alt text-primary-500 mr-1.5"></i>
+                        {{ destination.city }}, {{ destination.country }}
+                        {% if destination.climate %}
+                        <span class="mx-2">•</span>
+                        <i class="fas fa-sun text-secondary-500 mr-1.5"></i>
+                        {{ destination.climate }}
+                        {% endif %}
+                    </p>
+                    
+                    <p class="text-gray-600 mb-4 line-clamp-2">{{ destination.description|truncatechars:100 }}</p>
+                    
+                    <a href="{% url 'destination_detail' destination.id %}" class="inline-block text-center w-full bg-white border border-primary-500 hover:bg-primary-50 text-primary-600 py-2 rounded-lg transition-all font-medium shadow-sm hover:shadow mt-2">
+                        View Destination
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-4 py-16 text-center">
+                <i class="fas fa-map-marked-alt text-5xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500 text-lg">No destinations match your filters.</p>
+                <p class="text-gray-400 mt-2">Try changing your filter criteria to see more results.</p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- List View (hidden by default) -->
+        <div id="list-view" class="hidden space-y-6">
+            {% for destination in destinations %}
+            <div class="destination-card bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row"
+                 data-country="{{ destination.country }}" 
+                 data-climate="{{ destination.climate }}" 
+                 data-vacation-type="{{ destination.vacation_type }}">
+                <div class="relative md:w-1/4">
+                    {% if destination.image %}
+                    <img src="{{ destination.image.url }}" alt="{{ destination.name }}" class="w-full h-48 md:h-full object-cover">
+                    {% else %}
+                    <div class="w-full h-48 md:h-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
+                        <i class="fas fa-mountain text-5xl text-white"></i>
+                    </div>
+                    {% endif %}
+                    
+                    {% if destination.featured %}
+                    <div class="absolute top-4 left-4">
+                        <span class="bg-primary-500 text-white text-xs font-medium px-2.5 py-1 rounded-full flex items-center">
+                            <i class="fas fa-star mr-1"></i> Featured
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="p-6 md:w-3/4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">{{ destination.name }}</h3>
+                            <p class="text-gray-700 flex items-center text-sm">
+                                <i class="fas fa-map-marker-alt text-primary-500 mr-1.5"></i>
+                                {{ destination.city }}, {{ destination.country }}
+                                {% if destination.climate %}
+                                <span class="mx-2">•</span>
+                                <i class="fas fa-sun text-secondary-500 mr-1.5"></i>
+                                {{ destination.climate }}
+                                {% endif %}
+                            </p>
+                        </div>
+                        
+                        {% if destination.vacation_type %}
+                        <span class="bg-secondary-500 text-white text-xs font-medium px-2.5 py-1 rounded-full">{{ destination.vacation_type }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="text-gray-600 mb-4">{{ destination.description|truncatechars:200 }}</p>
+                    
+                    <div class="flex items-center justify-between mt-4">
+                        <div class="flex items-center text-sm text-gray-600">
+                            <span class="inline-flex items-center mr-4">
+                                <i class="fas fa-hotel text-primary-500 mr-1.5"></i>
+                                {{ destination.hotels.count }} Hotels
+                            </span>
+                            <span class="inline-flex items-center">
+                                <i class="fas fa-camera text-primary-500 mr-1.5"></i>
+                                {{ destination.attractions.count }} Attractions
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <button class="text-gray-400 hover:text-pink-500 transition-colors">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            <a href="{% url 'destination_detail' destination.id %}" class="inline-block text-center bg-primary-600 hover:bg-primary-700 text-white py-2 px-4 rounded-lg transition-all font-medium shadow-sm hover:shadow">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Inspiration Section -->
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-gray-900 mb-12 text-center">Travel Inspiration</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all group">
+                <div class="relative h-48 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmVhY2h8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60" alt="Beach Vacations" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                    <div class="absolute bottom-4 left-4 right-4">
+                        <h3 class="text-xl font-bold text-white">Beach Vacations</h3>
+                        <p class="text-white/80 text-sm">Sun, sand, and relaxation</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all group">
+                <div class="relative h-48 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bW91bnRhaW5zfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60" alt="Mountain Retreats" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                    <div class="absolute bottom-4 left-4 right-4">
+                        <h3 class="text-xl font-bold text-white">Mountain Retreats</h3>
+                        <p class="text-white/80 text-sm">Majestic peaks and serenity</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all group">
+                <div class="relative h-48 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1444723121867-7a241cacace9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8Y2l0eXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60" alt="City Breaks" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                    <div class="absolute bottom-4 left-4 right-4">
+                        <h3 class="text-xl font-bold text-white">City Breaks</h3>
+                        <p class="text-white/80 text-sm">Urban adventures await</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all group">
+                <div class="relative h-48 overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8aGlzdG9yaWNhbHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60" alt="Cultural Experiences" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                    <div class="absolute bottom-4 left-4 right-4">
+                        <h3 class="text-xl font-bold text-white">Cultural Experiences</h3>
+                        <p class="text-white/80 text-sm">History and traditions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter -->
+<section class="py-16 bg-primary-600">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl font-bold text-white mb-4">Get Travel Inspiration</h2>
+            <p class="text-white/80 text-lg mb-8">Subscribe to our newsletter for exclusive deals and destination highlights.</p>
+            
+            <form class="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+                <input type="email" placeholder="Your email address" class="flex-grow py-3 px-4 rounded-lg border-0 focus:ring-2 focus:ring-white">
+                <button type="submit" class="bg-white text-primary-600 font-medium py-3 px-6 rounded-lg hover:bg-gray-100 transition-colors shadow-lg">
+                    Subscribe
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Filter functionality
+        const destinationCards = document.querySelectorAll('.destination-card');
+        const countElement = document.getElementById('destination-count');
+        const countryFilter = document.getElementById('country-filter');
+        const climateFilter = document.getElementById('climate-filter');
+        const vacationTypeFilter = document.getElementById('vacation-type-filter');
+        
+        function applyFilters() {
+            const country = countryFilter.value;
+            const climate = climateFilter.value;
+            const vacationType = vacationTypeFilter.value;
+            let visibleCount = 0;
+            
+            destinationCards.forEach(card => {
+                const cardCountry = card.dataset.country;
+                const cardClimate = card.dataset.climate;
+                const cardVacationType = card.dataset.vacationType;
+                
+                // Check if card matches all active filters
+                const matchesCountry = !country || cardCountry === country;
+                const matchesClimate = !climate || cardClimate === climate;
+                const matchesVacationType = !vacationType || cardVacationType === vacationType;
+                
+                if (matchesCountry && matchesClimate && matchesVacationType) {
+                    card.style.display = '';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Update count
+            countElement.textContent = visibleCount;
+        }
+        
+        // Add event listeners to filters
+        countryFilter.addEventListener('change', applyFilters);
+        climateFilter.addEventListener('change', applyFilters);
+        vacationTypeFilter.addEventListener('change', applyFilters);
+        
+        // View toggle functionality
+        const gridView = document.getElementById('grid-view');
+        const listView = document.getElementById('list-view');
+        const gridButton = document.getElementById('view-grid');
+        const listButton = document.getElementById('view-list');
+        
+        gridButton.addEventListener('click', function() {
+            gridView.classList.remove('hidden');
+            listView.classList.add('hidden');
+            gridButton.classList.add('bg-primary-50', 'text-primary-600');
+            gridButton.classList.remove('bg-gray-50', 'text-gray-600');
+            listButton.classList.add('bg-gray-50', 'text-gray-600');
+            listButton.classList.remove('bg-primary-50', 'text-primary-600');
+        });
+        
+        listButton.addEventListener('click', function() {
+            gridView.classList.add('hidden');
+            listView.classList.remove('hidden');
+            listButton.classList.add('bg-primary-50', 'text-primary-600');
+            listButton.classList.remove('bg-gray-50', 'text-gray-600');
+            gridButton.classList.add('bg-gray-50', 'text-gray-600');
+            gridButton.classList.remove('bg-primary-50', 'text-primary-600');
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

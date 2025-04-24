@@ -1,0 +1,427 @@
+{% extends "tourgid/base.html" %}
+
+{% block title %}Hotels - TourGid{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative bg-gradient-to-r from-primary-700 to-primary-900 py-16">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="max-w-3xl">
+            <h1 class="text-4xl font-bold text-white mb-4">Find Your Perfect Stay</h1>
+            <p class="text-xl text-white/80 mb-6">Discover premium hotels and accommodations worldwide, from luxury resorts to boutique stays.</p>
+            
+            <!-- Search -->
+            <div class="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/20">
+                <form action="{% url 'search' %}" method="GET" class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-grow">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <i class="fas fa-search text-white/60"></i>
+                            </div>
+                            <input type="text" name="q" placeholder="Search hotels by name or location" class="w-full bg-transparent border border-white/30 text-white placeholder-white/60 rounded-lg pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-white/50">
+                        </div>
+                    </div>
+                    <button type="submit" class="bg-white text-primary-700 hover:bg-primary-50 font-medium px-6 py-3 rounded-lg shadow-md transition-all">
+                        <i class="fas fa-paper-plane mr-2"></i> Search
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Decorative elements -->
+    <div class="absolute right-10 top-10 text-white/10 text-9xl">
+        <i class="fas fa-hotel"></i>
+    </div>
+    <div class="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-t from-white to-transparent"></div>
+    
+    {% if featured_destination and featured_destination.cover_image %}
+    <div class="absolute inset-0 z-0 opacity-20">
+        <img src="{{ featured_destination.cover_image.url }}" alt="{{ featured_destination.name }}" class="w-full h-full object-cover">
+    </div>
+    {% endif %}
+</section>
+
+<!-- Filter Section -->
+<section class="bg-white py-8 shadow-sm sticky top-16 z-40">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <form method="GET" action="{% url 'hotels' %}" class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="flex flex-wrap gap-3">
+                <div class="relative">
+                    <select id="destination" name="destination" class="appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2 pl-4 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                        <option value="">All Destinations</option>
+                        {% for destination in destinations %}
+                        <option value="{{ destination.id }}" {% if request.GET.destination == destination.id|stringformat:"i" %}selected{% endif %}>
+                            {{ destination.name }}, {{ destination.country }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </div>
+                </div>
+                
+                <div class="relative">
+                    <select id="min_rating" name="rating" class="appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2 pl-4 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                    {# ^--- ИЗМЕНЕНО name="rating" ---^ #}
+                        <option value="">Any Rating</option>
+                        <option value="5" {% if request.GET.rating == '5' %}selected{% endif %}>5 Stars</option>
+                                        {# ^--- ИЗМЕНЕНО request.GET.rating ---^ #}
+                        <option value="4" {% if request.GET.rating == '4' %}selected{% endif %}>4+ Stars</option>
+                                        {# ^--- ИЗМЕНЕНО request.GET.rating ---^ #}
+                        <option value="3" {% if request.GET.rating == '3' %}selected{% endif %}>3+ Stars</option>
+                                        {# ^--- ИЗМЕНЕНО request.GET.rating ---^ #}
+                        <option value="2" {% if request.GET.rating == '2' %}selected{% endif %}>2+ Stars</option>
+                                        {# ^--- ИЗМЕНЕНО request.GET.rating ---^ #}
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </div>
+                </div>
+                
+                <div class="relative">
+                    <select id="accommodation_type" name="accommodation_type" class="appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2 pl-4 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                        <option value="">All Types</option>
+                        <option value="hotel" {% if request.GET.accommodation_type == 'hotel' %}selected{% endif %}>Hotel</option>
+                        <option value="hostel" {% if request.GET.accommodation_type == 'hostel' %}selected{% endif %}>Hostel</option>
+                        <option value="apartment" {% if request.GET.accommodation_type == 'apartment' %}selected{% endif %}>Apartment</option>
+                        <option value="villa" {% if request.GET.accommodation_type == 'villa' %}selected{% endif %}>Villa</option>
+                        <option value="resort" {% if request.GET.accommodation_type == 'resort' %}selected{% endif %}>Resort</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <span class="text-sm text-gray-600">Sort by:</span>
+                <div class="relative">
+                    <select id="sort" name="sort" onchange="this.form.submit()" class="appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2 pl-4 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                        <option value="rating" {% if request.GET.sort == 'rating' or not request.GET.sort %}selected{% endif %}>Top Rated</option>
+                        <option value="price_low" {% if request.GET.sort == 'price_low' %}selected{% endif %}>Price (Low to High)</option>
+                        <option value="price_high" {% if request.GET.sort == 'price_high' %}selected{% endif %}>Price (High to Low)</option>
+                        <option value="name" {% if request.GET.sort == 'name' %}selected{% endif %}>Name (A-Z)</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </div>
+                </div>
+                
+                <div class="flex border border-gray-200 rounded-lg overflow-hidden">
+                    <button id="view-grid" class="px-3 py-2 bg-primary-50 text-primary-600 hover:bg-primary-100">
+                        <i class="fas fa-th"></i>
+                    </button>
+                    <button id="view-list" class="px-3 py-2 bg-gray-50 text-gray-600 hover:bg-gray-100">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Hotels Grid -->
+<section class="py-12">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mb-8 flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-gray-900">Hotels & Accommodations</h2>
+            <p class="text-gray-600">Showing <span id="hotel-count">{{ hotels.paginator.count }}</span> hotels</p>
+        </div>
+        
+        <!-- Grid View (default) -->
+        <div id="grid-view" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {% for hotel in hotels %}
+            <div class="hotel-card bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all card-hover group">
+                <div class="relative">
+                    {% if hotel.image %}
+                    <img src="{{ hotel.image.url }}" alt="{{ hotel.name }}" class="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out">
+                    {% else %}
+                    <div class="w-full h-52 bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
+                        <i class="fas fa-hotel text-4xl text-white"></i>
+                    </div>
+                    {% endif %}
+                    <div class="absolute top-4 left-4 inline-flex items-center">
+                        <span class="text-white bg-black/50 backdrop-blur-sm px-2 py-1 rounded text-xs font-medium flex items-center">
+                            <i class="fas fa-star text-yellow-400 mr-1"></i> {{ hotel.rating }}
+                        </span>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                        <h3 class="text-white font-semibold truncate">{{ hotel.name }}</h3>
+                        <p class="text-white/80 text-sm truncate flex items-center">
+                            <i class="fas fa-map-marker-alt text-primary-400 mr-1.5"></i>
+                            {{ hotel.destination.name }}, {{ hotel.destination.country }}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="p-5 border-t border-gray-100">
+                    <!-- Price and Booking -->
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-baseline">
+                            <span class="text-xl font-bold text-gray-800">${{ hotel.price_per_night }}</span>
+                            <span class="text-sm text-gray-500 ml-1">/night</span>
+                        </div>
+                        <span class="bg-gray-100 text-gray-800 text-xs px-2.5 py-1 rounded-full">
+                            {{ hotel.get_accommodation_type_display }}
+                        </span>
+                    </div>
+                    
+                    <!-- Amenities -->
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        {% if hotel.amenities.wifi %}
+                        <span class="bg-gray-100 text-gray-800 text-xs px-2.5 py-1 rounded-full flex items-center">
+                            <i class="fas fa-wifi text-primary-500 mr-1.5"></i> WiFi
+                        </span>
+                        {% endif %}
+                        {% if hotel.amenities.pool %}
+                        <span class="bg-gray-100 text-gray-800 text-xs px-2.5 py-1 rounded-full flex items-center">
+                            <i class="fas fa-swimming-pool text-primary-500 mr-1.5"></i> Pool
+                        </span>
+                        {% endif %}
+                        {% if hotel.amenities.restaurant %}
+                        <span class="bg-gray-100 text-gray-800 text-xs px-2.5 py-1 rounded-full flex items-center">
+                            <i class="fas fa-utensils text-primary-500 mr-1.5"></i> Restaurant
+                        </span>
+                        {% endif %}
+                        {% if hotel.amenities.spa %}
+                        <span class="bg-gray-100 text-gray-800 text-xs px-2.5 py-1 rounded-full flex items-center">
+                            <i class="fas fa-spa text-primary-500 mr-1.5"></i> Spa
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Action Button -->
+                    <a href="{% url 'hotel_detail' hotel.id %}" class="block text-center bg-white border border-primary-500 hover:bg-primary-50 text-primary-600 py-2 rounded-lg transition-all font-medium shadow-sm hover:shadow">
+                        View Details
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-4 py-16 text-center">
+                <i class="fas fa-hotel text-5xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500 text-lg">No hotels match your filters.</p>
+                <p class="text-gray-400 mt-2">Try changing your filter criteria to see more results.</p>
+                <a href="{% url 'hotels' %}" class="inline-block mt-4 text-primary-600 hover:text-primary-700">
+                    <i class="fas fa-arrow-left mr-2"></i> Clear all filters
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- List View (hidden by default) -->
+        <div id="list-view" class="hidden space-y-6">
+            {% for hotel in hotels %}
+            <div class="hotel-card bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row">
+                <div class="relative md:w-1/4">
+                    {% if hotel.image %}
+                    <img src="{{ hotel.image.url }}" alt="{{ hotel.name }}" class="w-full h-48 md:h-full object-cover">
+                    {% else %}
+                    <div class="w-full h-48 md:h-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
+                        <i class="fas fa-hotel text-5xl text-white"></i>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="absolute top-4 left-4">
+                        <span class="text-white bg-black/50 backdrop-blur-sm px-2 py-1 rounded text-xs font-medium flex items-center">
+                            <i class="fas fa-star text-yellow-400 mr-1"></i> {{ hotel.rating }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="p-6 md:w-3/4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">{{ hotel.name }}</h3>
+                            <p class="text-gray-700 flex items-center text-sm">
+                                <i class="fas fa-map-marker-alt text-primary-500 mr-1.5"></i>
+                                {{ hotel.destination.name }}, {{ hotel.destination.country }}
+                                <span class="mx-2">•</span>
+                                <span class="bg-gray-100 text-gray-800 text-xs px-2 py-0.5 rounded-full">
+                                    {{ hotel.get_accommodation_type_display }}
+                                </span>
+                            </p>
+                        </div>
+                        
+                        <div class="text-right">
+                            <div class="text-xl font-bold text-gray-800">${{ hotel.price_per_night }}<span class="text-sm text-gray-500">/night</span></div>
+                            <div class="flex mt-1">
+                                {% for i in "12345" %}
+                                <i class="fas fa-star {% if forloop.counter <= hotel.rating %}text-yellow-400{% else %}text-gray-200{% endif %} text-xs"></i>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="text-gray-600 mb-4">{{ hotel.description|truncatechars:200 }}</p>
+                    
+                    <div class="flex items-center justify-between mt-4">
+                        <div class="flex flex-wrap gap-2">
+                            {% if hotel.amenities.wifi %}
+                            <span class="bg-gray-100 text-gray-800 text-xs px-2.5 py-1 rounded-full flex items-center">
+                                <i class="fas fa-wifi text-primary-500 mr-1.5"></i> WiFi
+                            </span>
+                            {% endif %}
+                            {% if hotel.amenities.pool %}
+                            <span class="bg-gray-100 text-gray-800 text-xs px-2.5 py-1 rounded-full flex items-center">
+                                <i class="fas fa-swimming-pool text-primary-500 mr-1.5"></i> Pool
+                            </span>
+                            {% endif %}
+                            {% if hotel.amenities.restaurant %}
+                            <span class="bg-gray-100 text-gray-800 text-xs px-2.5 py-1 rounded-full flex items-center">
+                                <i class="fas fa-utensils text-primary-500 mr-1.5"></i> Restaurant
+                            </span>
+                            {% endif %}
+                            {% if hotel.amenities.spa %}
+                            <span class="bg-gray-100 text-gray-800 text-xs px-2.5 py-1 rounded-full flex items-center">
+                                <i class="fas fa-spa text-primary-500 mr-1.5"></i> Spa
+                            </span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <button class="text-gray-400 hover:text-pink-500 transition-colors">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            <a href="{% url 'hotel_detail' hotel.id %}" class="inline-block text-center bg-primary-600 hover:bg-primary-700 text-white py-2 px-4 rounded-lg transition-all font-medium shadow-sm hover:shadow">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if hotels.has_other_pages %}
+        <div class="flex justify-center mt-12">
+            <nav class="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                {% if hotels.has_previous %}
+                <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.destination %}destination={{ request.GET.destination }}&{% endif %}{% if request.GET.min_rating %}min_rating={{ request.GET.min_rating }}&{% endif %}{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}page={{ hotels.previous_page_number }}" class="relative inline-flex items-center px-3 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    <i class="fas fa-chevron-left text-xs mr-1"></i> Previous
+                </a>
+                {% else %}
+                <span class="relative inline-flex items-center px-3 py-2 rounded-l-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-500 cursor-not-allowed">
+                    <i class="fas fa-chevron-left text-xs mr-1"></i> Previous
+                </span>
+                {% endif %}
+                
+                {% for i in hotels.paginator.page_range %}
+                    {% if hotels.number == i %}
+                    <span class="relative inline-flex items-center px-4 py-2 border border-primary-500 bg-primary-50 text-sm font-medium text-primary-600">
+                        {{ i }}
+                    </span>
+                    {% elif i > hotels.number|add:'-3' and i < hotels.number|add:'3' %}
+                    <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.destination %}destination={{ request.GET.destination }}&{% endif %}{% if request.GET.min_rating %}min_rating={{ request.GET.min_rating }}&{% endif %}{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}page={{ i }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        {{ i }}
+                    </a>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if hotels.has_next %}
+                <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.destination %}destination={{ request.GET.destination }}&{% endif %}{% if request.GET.min_rating %}min_rating={{ request.GET.min_rating }}&{% endif %}{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}page={{ hotels.next_page_number }}" class="relative inline-flex items-center px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    Next <i class="fas fa-chevron-right text-xs ml-1"></i>
+                </a>
+                {% else %}
+                <span class="relative inline-flex items-center px-3 py-2 rounded-r-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-500 cursor-not-allowed">
+                    Next <i class="fas fa-chevron-right text-xs ml-1"></i>
+                </span>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Key Benefits Section -->
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Book With Confidence</h2>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Enjoy exclusive benefits when booking your accommodation through TourGid</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-all text-center">
+                <div class="w-16 h-16 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-percentage text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Best Rate Guarantee</h3>
+                <p class="text-gray-600">Find a lower price elsewhere? We'll match it and give you an additional 10% discount.</p>
+            </div>
+            
+            <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-all text-center">
+                <div class="w-16 h-16 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-ban text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Free Cancellation</h3>
+                <p class="text-gray-600">Plans change? No problem. Most hotels offer free cancellation up to 24 hours before check-in.</p>
+            </div>
+            
+            <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-all text-center">
+                <div class="w-16 h-16 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-gift text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Exclusive Benefits</h3>
+                <p class="text-gray-600">Enjoy room upgrades, early check-in, and late check-out at participating hotels.</p>
+            </div>
+            
+            <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-all text-center">
+                <div class="w-16 h-16 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-headset text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">24/7 Support</h3>
+                <p class="text-gray-600">Our dedicated team is available around the clock to assist with any hotel-related questions.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter -->
+<section class="py-16 bg-primary-600">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl font-bold text-white mb-4">Get Exclusive Hotel Deals</h2>
+            <p class="text-white/80 text-lg mb-8">Subscribe to our newsletter for special rates and last-minute offers.</p>
+            
+            <form class="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+                <input type="email" placeholder="Your email address" class="flex-grow py-3 px-4 rounded-lg border-0 focus:ring-2 focus:ring-white">
+                <button type="submit" class="bg-white text-primary-600 font-medium py-3 px-6 rounded-lg hover:bg-gray-100 transition-colors shadow-lg">
+                    Subscribe
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // View toggle functionality
+        const gridView = document.getElementById('grid-view');
+        const listView = document.getElementById('list-view');
+        const gridButton = document.getElementById('view-grid');
+        const listButton = document.getElementById('view-list');
+        
+        gridButton.addEventListener('click', function() {
+            gridView.classList.remove('hidden');
+            listView.classList.add('hidden');
+            gridButton.classList.add('bg-primary-50', 'text-primary-600');
+            gridButton.classList.remove('bg-gray-50', 'text-gray-600');
+            listButton.classList.add('bg-gray-50', 'text-gray-600');
+            listButton.classList.remove('bg-primary-50', 'text-primary-600');
+        });
+        
+        listButton.addEventListener('click', function() {
+            gridView.classList.add('hidden');
+            listView.classList.remove('hidden');
+            listButton.classList.add('bg-primary-50', 'text-primary-600');
+            listButton.classList.remove('bg-gray-50', 'text-gray-600');
+            gridButton.classList.add('bg-gray-50', 'text-gray-600');
+            gridButton.classList.remove('bg-primary-50', 'text-primary-600');
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

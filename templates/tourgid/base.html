@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{% csrf_token %}">
+    <title>{% block title %}TourGid{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        /* Tailwind Custom Colors */
+        :root {
+            --color-primary-50: #e6f5ff;
+            --color-primary-100: #cce9ff;
+            --color-primary-200: #99d2ff;
+            --color-primary-300: #66bcff;
+            --color-primary-400: #33a5ff;
+            --color-primary-500: #0088ff;
+            --color-primary-600: #006dcc;
+            --color-primary-700: #005299;
+            --color-primary-800: #003666;
+            --color-primary-900: #001b33;
+            
+            --color-secondary-50: #fff7e6;
+            --color-secondary-100: #ffefc9;
+            --color-secondary-200: #ffe093;
+            --color-secondary-300: #ffd05d;
+            --color-secondary-400: #ffc126;
+            --color-secondary-500: #f0b000;
+            --color-secondary-600: #cc9600;
+            --color-secondary-700: #997100;
+            --color-secondary-800: #664b00;
+            --color-secondary-900: #332600;
+            
+            --color-accent-50: #f5e6ff;
+            --color-accent-100: #e8ccff;
+            --color-accent-200: #d199ff;
+            --color-accent-300: #ba66ff;
+            --color-accent-400: #a333ff;
+            --color-accent-500: #9000ff;
+            --color-accent-600: #7300cc;
+            --color-accent-700: #560099;
+            --color-accent-800: #390066;
+            --color-accent-900: #1c0033;
+        }
+        
+        /* Gradient backgrounds */
+        .gradient-primary {
+            background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
+        }
+        
+        .gradient-secondary {
+            background: linear-gradient(135deg, var(--color-secondary-400), var(--color-secondary-600));
+        }
+        
+        .gradient-accent {
+            background: linear-gradient(135deg, var(--color-accent-400), var(--color-accent-600));
+        }
+        
+        /* Hover lift effect */
+        .hover-lift {
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-5px);
+        }
+        
+        /* Line clamp utilities */
+        .line-clamp-1, .line-clamp-2, .line-clamp-3 {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+        }
+        
+        .line-clamp-1 {
+            -webkit-line-clamp: 1;
+        }
+        
+        .line-clamp-2 {
+            -webkit-line-clamp: 2;
+        }
+        
+        .line-clamp-3 {
+            -webkit-line-clamp: 3;
+        }
+        
+        /* Navigation styles */
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--color-primary-500);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover:after, .nav-link.active:after {
+            width: 100%;
+        }
+        
+        .nav-link.active {
+            color: var(--color-primary-600);
+            font-weight: 500;
+        }
+        
+        /* Material Design elevation shadows */
+        .shadow-elevation-1 {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+        }
+        
+        .shadow-elevation-2 {
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+        }
+        
+        .shadow-elevation-3 {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c5c5c5;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+    
+    <!-- TailwindCSS Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Montserrat', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary': {
+                            50: '#e6f5ff',
+                            100: '#cce9ff',
+                            200: '#99d2ff',
+                            300: '#66bcff',
+                            400: '#33a5ff',
+                            500: '#0088ff',
+                            600: '#006dcc',
+                            700: '#005299',
+                            800: '#003666',
+                            900: '#001b33',
+                        },
+                        'secondary': {
+                            50: '#fff7e6',
+                            100: '#ffefc9',
+                            200: '#ffe093',
+                            300: '#ffd05d',
+                            400: '#ffc126',
+                            500: '#f0b000',
+                            600: '#cc9600',
+                            700: '#997100',
+                            800: '#664b00',
+                            900: '#332600',
+                        },
+                        'accent': {
+                            50: '#f5e6ff',
+                            100: '#e8ccff',
+                            200: '#d199ff',
+                            300: '#ba66ff',
+                            400: '#a333ff',
+                            500: '#9000ff',
+                            600: '#7300cc',
+                            700: '#560099',
+                            800: '#390066',
+                            900: '#1c0033',
+                        },
+                    },
+                }
+            }
+        }
+    </script>
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="min-h-screen flex flex-col bg-gray-50">
+    <!-- Navigation -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo and Brand -->
+                <div class="flex items-center">
+                    <a href="{% url 'home' %}" class="flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-primary-500 flex items-center justify-center mr-3">
+                            <i class="fas fa-globe-americas text-white text-xl"></i>
+                        </div>
+                        <span class="text-2xl font-bold text-primary-600">Tour<span class="text-secondary-500">Gid</span></span>
+                    </a>
+                </div>
+                
+                <!-- Main Navigation -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="{% url 'destinations' %}" class="nav-link text-gray-700 hover:text-primary-600 px-1 py-2 text-sm font-medium">
+                        <i class="fas fa-map-marker-alt mr-2"></i> Destinations
+                    </a>
+                    <a href="{% url 'hotels' %}" class="nav-link text-gray-700 hover:text-primary-600 px-1 py-2 text-sm font-medium">
+                        <i class="fas fa-hotel mr-2"></i> Hotels
+                    </a>
+                    <a href="{% url 'excursions' %}" class="nav-link text-gray-700 hover:text-primary-600 px-1 py-2 text-sm font-medium">
+                        <i class="fas fa-hiking mr-2"></i> Excursions
+                    </a>
+                    <a href="{% url 'attractions' %}" class="nav-link text-gray-700 hover:text-primary-600 px-1 py-2 text-sm font-medium">
+                        <i class="fas fa-camera mr-2"></i> Attractions
+                    </a>
+                    <a href="{% url 'about' %}" class="nav-link text-gray-700 hover:text-primary-600 px-1 py-2 text-sm font-medium">
+                        <i class="fas fa-info-circle mr-2"></i> About
+                    </a>
+                </nav>
+                
+                <!-- Right side navigation (search, user) -->
+                <div class="flex items-center space-x-4">
+                    <div class="hidden md:block">
+                        <form action="{% url 'search' %}" method="GET" class="relative">
+                            <input type="text" name="q" placeholder="Search..." class="w-60 py-1.5 pl-10 pr-4 rounded-full text-sm border border-gray-300 focus:ring-2 focus:ring-primary-300 focus:border-primary-400 focus:outline-none">
+                            <button type="submit" class="absolute left-0 top-0 ml-3 h-full flex items-center text-gray-400">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="flex items-center space-x-2">
+                        <a href="{% url 'user_favorites' %}" class="p-2 text-gray-600 hover:text-primary-600 transition-colors" title="My Favorites">
+                            <i class="fas fa-heart"></i>
+                            <span class="sr-only">Favorites</span>
+                        </a>
+                        
+                        {% if user.is_authenticated %}
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" class="flex items-center text-sm font-medium text-gray-700 rounded-full bg-gray-100 p-1 pl-3 pr-2 focus:outline-none hover:bg-gray-200 transition-colors">
+                                <span class="mr-1">{{ user.first_name }}</span>
+                                <span class="w-8 h-8 rounded-full bg-primary-200 flex items-center justify-center text-primary-800 uppercase font-semibold">
+                                    {{ user.first_name|slice:":1" }}
+                                </span>
+                            </button>
+
+                            <div x-show="open" @click.away="open = false" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-elevation-2 bg-white ring-1 ring-black ring-opacity-5 py-1" style="display: none; z-index: 1000;">  {# Added z-index: 1000; #}
+                                <a href="{% url 'profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</a>
+                                <a href="{% url 'bookings' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Bookings</a>
+                                <a href="{% url 'settings' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                                <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <a href="{% url 'login' %}" class="text-primary-600 hover:text-primary-700 text-sm font-medium">Log In</a>
+                        <a href="{% url 'signup' %}" class="ml-1 bg-primary-600 hover:bg-primary-700 text-white text-sm px-4 py-2 rounded-full font-medium transition-colors">Sign Up</a>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Mobile menu button -->
+                    <button type="button" class="md:hidden bg-white p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none" aria-label="Main menu" aria-expanded="false">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu, show/hide based on menu state -->
+        <div class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="{% url 'destinations' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">
+                    <i class="fas fa-map-marker-alt mr-2"></i> Destinations
+                </a>
+                <a href="{% url 'hotels' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">
+                    <i class="fas fa-hotel mr-2"></i> Hotels
+                </a>
+                <a href="{% url 'excursions' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">
+                    <i class="fas fa-hiking mr-2"></i> Excursions
+                </a>
+                <a href="{% url 'attractions' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">
+                    <i class="fas fa-camera mr-2"></i> Attractions
+                </a>
+                <a href="{% url 'about' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">
+                    <i class="fas fa-info-circle mr-2"></i> About
+                </a>
+                
+                <div class="mt-3 px-3">
+                    <form action="{% url 'search' %}" method="GET" class="relative">
+                        <input type="text" name="q" placeholder="Search..." class="w-full py-2 pl-10 pr-4 rounded-lg text-sm border border-gray-300 focus:outline-none">
+                        <button type="submit" class="absolute left-0 top-0 ml-3 h-full flex items-center text-gray-400">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="flex-grow">
+        <div class="py-6 px-4 sm:px-6 lg:px-8">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Logo and About -->
+                <div class="col-span-1 md:col-span-1">
+                    <a href="{% url 'home' %}" class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-primary-500 flex items-center justify-center mr-3">
+                            <i class="fas fa-globe-americas text-white text-xl"></i>
+                        </div>
+                        <span class="text-xl font-bold text-primary-600">Tour<span class="text-secondary-500">Gid</span></span>
+                    </a>
+                    <p class="text-gray-600 text-sm mb-4">
+                        Your go-to platform for discovering amazing destinations, finding comfortable accommodations, and experiencing unforgettable adventures.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="https://www.facebook.com/" class="text-gray-400 hover:text-primary-600">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://x.com/" class="text-gray-400 hover:text-primary-600">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://www.instagram.com/" class="text-gray-400 hover:text-primary-600">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://pinterest.com/" class="text-gray-400 hover:text-primary-600">
+                            <i class="fab fa-pinterest-p"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Footer Links -->
+                <div class="col-span-1">
+                    <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Explore</h3>
+                    <ul class="space-y-3">
+                        <li><a href="{% url 'destinations' %}" class="text-gray-600 hover:text-primary-600 text-sm">Destinations</a></li>
+                        <li><a href="{% url 'hotels' %}" class="text-gray-600 hover:text-primary-600 text-sm">Hotels</a></li>
+                        <li><a href="{% url 'excursions' %}" class="text-gray-600 hover:text-primary-600 text-sm">Excursions</a></li>
+                        <li><a href="{% url 'attractions' %}" class="text-gray-600 hover:text-primary-600 text-sm">Attractions</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-span-1">
+                    <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Company</h3>
+                    <ul class="space-y-3">
+                        <li><a href="{% url 'about' %}" class="text-gray-600 hover:text-primary-600 text-sm">About Us</a></li>
+                        <li><a href="{% url 'about' %}" class="text-gray-600 hover:text-primary-600 text-sm">Key features</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-primary-600 text-sm">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-primary-600 text-sm">Terms of Service</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Newsletter -->
+                <div class="col-span-1">
+                    <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Subscribe to updates</h3>
+                    <p class="text-gray-600 text-sm mb-4">Get the latest travel tips and destination insights directly to your inbox.</p>
+                    <form class="flex flex-col space-y-2">
+                        <div>
+                            <label for="email" class="sr-only">Email</label>
+                            <input id="email" name="email" type="email" autocomplete="email" required class="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-300 focus:border-primary-400 focus:outline-none" placeholder="Your email address">
+                        </div>
+                        <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white text-sm px-4 py-2 rounded-lg font-medium transition-colors">
+                            Subscribe
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="mt-8 pt-8 border-t border-gray-200">
+                <p class="text-center text-gray-400 text-sm">
+                    &copy; {% now "Y" %} TourGid. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Alpine.js for dropdown functionality -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Toggle mobile menu
+        document.querySelector('button[aria-label="Main menu"]').addEventListener('click', function() {
+            let menu = document.querySelector('.md\\:hidden.hidden');
+            menu.classList.toggle('hidden');
+        });
+        
+        // Set active link
+        document.addEventListener('DOMContentLoaded', function() {
+            let currentPath = window.location.pathname;
+            let navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                let href = link.getAttribute('href');
+                if (href === currentPath || currentPath.startsWith(href) && href !== '/') {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

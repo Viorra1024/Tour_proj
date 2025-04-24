@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Guidebook: {{ destination.name }}</title> {# Changed Title #}
+    <style>
+        /* --- Убрали @font-face --- */
+
+        /* --- Используем стандартный шрифт --- */
+        body {
+            font-family: sans-serif; /* Или serif, Arial, Times New Roman */
+            line-height: 1.4;
+            font-size: 10pt;
+        }
+        h1, h2, strong, b {
+             font-weight: bold; /* Стандартный жирный */
+        }
+        em, i {
+            font-style: italic; /* Стандартный курсив */
+        }
+
+        /* --- Остальные стили --- */
+        h1, h2 { color: #333; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 20px;}
+        h1 { font-size: 18pt; }
+        h2 { font-size: 14pt; }
+        .item { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dotted #eee; }
+        .item strong { display: block; font-size: 12pt; margin-bottom: 3px;}
+        .item p { margin: 0; }
+        .item small { color: #555; font-size: 9pt;}
+        hr { border: none; border-top: 1px solid #ccc; margin: 20px 0; }
+        .footer { text-align: center; font-size: 8pt; color: #777; margin-top: 30px;}
+    </style>
+</head>
+<body>
+    {# --- Заменяем текст на английский --- #}
+    <h1>Guidebook for: {{ destination.name }}</h1>
+    <p><em>{{ destination.city }}, {{ destination.country }}</em></p>
+    <p>Generated: {{ generation_date|date:"Y-m-d H:i" }}</p> {# Changed date format #}
+    <hr>
+    {# Убедись, что destination.description содержит английский текст #}
+    <p>{{ destination.description|linebreaks }}</p>
+
+    {# Changed header #}
+    <h2>Attractions (Top {{ attractions.count }})</h2>
+    {% for attraction in attractions %}
+        <div class="item">
+            <strong>{{ attraction.name }}</strong> {# Needs English name #}
+            {% if attraction.opening_hours %} <p><small>Opening Hours: {{ attraction.opening_hours }}</small></p> {% endif %}
+            <p><small>{{ attraction.description|truncatewords_html:40 }}</small></p> {# Needs English description #}
+        </div>
+    {% empty %}
+        <p>No attraction information available.</p> {# Changed text #}
+    {% endfor %}
+
+    {# Changed header #}
+    <h2>Hotels (Top {{ hotels.count }})</h2>
+     {% for hotel in hotels %}
+        <div class="item">
+            <strong>{{ hotel.name }}</strong> (Rating: {{ hotel.rating|default:"N/A" }}) {# Needs English name #}
+            <p><small>{{ hotel.address|default:"" }}</small></p> {# Needs English address #}
+        </div>
+    {% empty %}
+        <p>No hotel information available.</p> {# Changed text #}
+    {% endfor %}
+
+     {# Changed header #}
+     <h2>Excursions (Top {{ excursions.count }})</h2>
+     {% for excursion in excursions %}
+        <div class="item">
+            <strong>{{ excursion.name }}</strong> (Price: ${{ excursion.price }}) {# Needs English name #}
+            <p><small>Duration: {{ excursion.duration }}</small></p>
+            <p><small>{{ excursion.description|truncatewords_html:40 }}</small></p> {# Needs English description #}
+        </div>
+    {% empty %}
+        <p>No excursion information available.</p> {# Changed text #}
+    {% endfor %}
+
+    <hr>
+    <p class="footer">
+        Guide generated automatically. Information may not be complete. {# Changed text #}
+    </p>
+
+</body>
+</html>

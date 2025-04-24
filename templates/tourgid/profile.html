@@ -1,0 +1,475 @@
+{% extends "tourgid/base.html" %}
+
+{% block title %}My Profile - TourGid{% endblock %}
+
+{% block content %}
+<script src="//unpkg.com/alpinejs" defer></script>
+<!-- Profile Header -->
+<div class="relative">
+    <div class="w-full h-[200px] rounded-xl overflow-hidden shadow-lg">
+        <div class="absolute inset-0 bg-gradient-to-r from-primary-900/90 to-primary-700/70 z-10"></div>
+        <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Profile background" class="absolute inset-0 w-full h-full object-cover">
+        <div class="absolute inset-0 flex flex-col justify-center p-6 z-20">
+            <div class="max-w-6xl mx-auto w-full">
+                <h1 class="text-2xl md:text-4xl font-bold text-white mb-2">Welcome, {{ user.first_name }}</h1>
+                <p class="text-lg text-white/90 max-w-2xl">Manage your travel profile and explore your journey history</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Avatar -->
+<div class="max-w-6xl mx-auto -mt-16 relative z-20 flex justify-between items-end px-4 sm:px-0">
+    <div class="flex items-center">
+        <div class="w-32 h-32 rounded-full border-4 border-white bg-primary-200 flex items-center justify-center text-primary-800 text-4xl uppercase font-bold shadow-lg">
+            {{ user.first_name|slice:":1" }}{{ user.last_name|slice:":1" }}
+        </div>
+        <div class="ml-6 mt-10">
+            <h2 class="text-2xl font-bold text-gray-800">{{ user.first_name }} {{ user.last_name }}</h2>
+            <div class="flex items-center text-gray-600">
+                <i class="fas fa-envelope mr-2 text-primary-500"></i>
+                <span>{{ user.email }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="hidden md:block">
+        <a href="{% url 'settings' %}" class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg font-medium flex items-center shadow-sm">
+            <i class="fas fa-cog mr-2"></i> Edit Profile
+        </a>
+    </div>
+</div>
+
+<!-- Tabs Navigation -->
+<div class="max-w-6xl mx-auto mt-10" x-data="{ activeTab: 'overview' }">
+    <nav class="flex border-b border-gray-200"> {# <-- Убираем x-data отсюда #}
+        <button @click="activeTab = 'overview'" :class="{ 'text-primary-600 border-primary-500': activeTab === 'overview', 'text-gray-500 hover:text-gray-700 border-transparent': activeTab !== 'overview' }" ...>
+            <i class="fas fa-user mr-2"></i> Overview
+        </button>
+        <button @click="activeTab = 'trips'" :class="{ 'text-primary-600 border-primary-500': activeTab === 'trips', ... }" class="px-4 py-3 text-sm font-medium border-b-2 flex items-center focus:outline-none ml-8">
+            <i class="fas fa-suitcase mr-2"></i> My Trips
+        </button>
+        <button @click="activeTab = 'favorites'" :class="{ 'text-primary-600 border-primary-500': activeTab === 'favorites', 'text-gray-500 hover:text-gray-700 border-transparent': activeTab !== 'favorites' }" class="px-4 py-3 text-sm font-medium border-b-2 flex items-center focus:outline-none ml-8">
+            <i class="fas fa-heart mr-2"></i> Favorites
+        </button>
+        <button @click="activeTab = 'reviews'" :class="{ 'text-primary-600 border-primary-500': activeTab === 'reviews', 'text-gray-500 hover:text-gray-700 border-transparent': activeTab !== 'reviews' }" class="px-4 py-3 text-sm font-medium border-b-2 flex items-center focus:outline-none ml-8">
+            <i class="fas fa-star mr-2"></i> Reviews
+        </button>
+    </nav>
+    
+    <!-- Tab Content -->
+    <div class="mt-8">
+        <!-- Overview Tab -->
+        <div x-show="activeTab === 'overview'" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Profile Information -->
+            <div class="md:col-span-2">
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-user-circle text-primary-500 mr-2"></i> Personal Information
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-1">First Name</label>
+                                <p class="text-gray-800">{{ user.first_name }}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-1">Last Name</label>
+                                <p class="text-gray-800">{{ user.last_name }}</p>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-1">Email Address</label>
+                            <p class="text-gray-800">{{ user.email }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-1">Phone Number</label>
+                            <p class="text-gray-800">{{ user.profile.phone_number|default:"Not provided" }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-1">Address</label>
+                            <p class="text-gray-800">{{ user.profile.address|default:"Not provided" }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-globe text-primary-500 mr-2"></i> Travel Preferences
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-1">Preferred Destinations</label>
+                            <div class="flex flex-wrap gap-2">
+                                {% for preference in user.profile.preferred_destinations.all %}
+                                <span class="bg-primary-50 text-primary-700 text-xs px-3 py-1 rounded-full">{{ preference.name }}</span>
+                                {% empty %}
+                                <span class="text-gray-600">No preferred destinations set</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-1">Travel Interests</label>
+                            <div class="flex flex-wrap gap-2">
+                                {% for interest in user.profile.travel_interests.all %}
+                                <span class="bg-secondary-50 text-secondary-700 text-xs px-3 py-1 rounded-full">{{ interest.name }}</span>
+                                {% empty %}
+                                <span class="text-gray-600">No travel interests set</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500 mb-1">Accommodation Preferences</label>
+                            <p class="text-gray-800">{{ user.profile.accommodation_preferences|default:"Not specified" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stats and Account Summary -->
+            <div class="md:col-span-1">
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-chart-line text-primary-500 mr-2"></i> Account Summary
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center pb-3 border-b border-gray-100">
+                            <div class="flex items-center">
+                                <i class="fas fa-calendar-check text-secondary-500 mr-2"></i>
+                                <span class="text-gray-700">Member Since</span>
+                            </div>
+                            <span class="font-medium">{{ user.date_joined|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="flex justify-between items-center pb-3 border-b border-gray-100">
+                            <div class="flex items-center">
+                                <i class="fas fa-plane-departure text-secondary-500 mr-2"></i>
+                                <span class="text-gray-700">Trips Taken</span>
+                            </div>
+                            <span class="font-medium">{{ user.bookings.count }}</span>
+                        </div>
+                        <div class="flex justify-between items-center pb-3 border-b border-gray-100">
+                            <div class="flex items-center">
+                                <i class="fas fa-heart text-secondary-500 mr-2"></i>
+                                <span class="text-gray-700">Favorites</span>
+                            </div>
+                            <span class="font-medium">{{ user.favorites.count }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-star text-secondary-500 mr-2"></i>
+                                <span class="text-gray-700">Reviews Written</span>
+                            </div>
+                            <span class="font-medium">{{ user.reviews.count }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                {# --- ИСПРАВЛЕННЫЙ Блок Membership Status --- #}
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                {# ^--- Убрали bg-gradient-primary и text-white, добавили bg-white ---^ #}
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">Membership Status</h3>
+                                                 {# ^--- Добавили text-gray-800 ---^ #}
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-medal text-2xl mr-3 text-primary-500"></i> {# Можно поменять цвет иконки, например, на text-primary-500 #}
+                        <div>
+                            <p class="text-gray-600 text-sm">Current Level</p>
+                             {# ^--- Изменили цвет на text-gray-600 ---^ #}
+                            <p class="font-semibold text-gray-900">{{ user.profile.membership_level|default:"Standard" }}</p>
+                                             {# ^--- Добавили text-gray-900 ---^ #}
+                        </div>
+                    </div>
+                    {# Изменили фон прогресс-бара на более заметный на белом фоне #}
+                    <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+                    {#               ^--- Изменили bg-white/20 на bg-gray-200 ---^ #}
+                        <div class="bg-primary-600 h-2 rounded-full" style="width: 65%"></div> {# Можно изменить цвет заполнения на bg-primary-600 #}
+                    </div>
+                    <p class="text-sm text-gray-600">65 points to next level</p>
+                                  {# ^--- Изменили цвет на text-gray-600 ---^ #}
+                    <a href="#" class="mt-4 block text-center bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-lg transition duration-300 font-medium shadow-sm hover:shadow">
+                    {# ^--- Кнопку можно оставить как есть или стилизовать иначе, например, как ссылки "Edit Profile" ---^ #}
+                        View Benefits
+                    </a>
+                </div>
+                {# --- Конец ИСПРАВЛЕННОГО блока Membership Status --- #}
+            </div>
+        </div>
+        
+        <!-- Trips Tab -->
+        <div x-show="activeTab === 'trips'" class="bg-white rounded-xl shadow-sm p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-semibold text-gray-800">My Travel History</h3>
+                <div class="flex space-x-2">
+                    <button class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-sm font-medium">
+                        <i class="fas fa-filter mr-1"></i> Filter
+                    </button>
+                    <button class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-sm font-medium">
+                        <i class="fas fa-sort mr-1"></i> Sort
+                    </button>
+                </div>
+            </div>
+            
+            {% if user.bookings.exists %}
+            <div class="space-y-6">
+                {% for booking in user.bookings.all %}
+                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div class="flex flex-col md:flex-row">
+                        <div class="w-full md:w-1/4 mb-4 md:mb-0">
+                            {% if booking.item.image %}
+                            <img src="{{ booking.item.image.url }}" alt="{{ booking.item.name }}" class="w-full h-32 object-cover rounded-lg">
+                            {% else %}
+                            <div class="w-full h-32 bg-gradient-to-r from-primary-400 to-primary-600 flex items-center justify-center rounded-lg">
+                                <i class="fas fa-suitcase text-4xl text-white"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="md:ml-6 flex-grow">
+                            <div class="flex flex-col md:flex-row md:justify-between md:items-start">
+                                <div>
+                                    <span class="inline-flex items-center bg-primary-50 text-primary-700 text-xs px-2 py-1 rounded-full mb-2">
+                                        {{ booking.get_type_display }}
+                                    </span>
+                                    <h4 class="text-lg font-semibold text-gray-800">{{ booking.item.name }}</h4>
+                                    <p class="text-gray-600 text-sm mb-2">{{ booking.item.destination.name }}, {{ booking.item.destination.country }}</p>
+                                </div>
+                                <div class="mt-2 md:mt-0 text-sm text-gray-600">
+                                    <div class="flex items-center mb-1">
+                                        <i class="fas fa-calendar text-primary-500 mr-2"></i> 
+                                        <span>{{ booking.start_date|date:"M d, Y" }} - {{ booking.end_date|date:"M d, Y" }}</span>
+                                    </div>
+                                    <div class="flex items-center mb-1">
+                                        <i class="fas fa-users text-primary-500 mr-2"></i> 
+                                        <span>{{ booking.guests }} Guests</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-money-bill-wave text-primary-500 mr-2"></i> 
+                                        <span>${{ booking.total_price }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex mt-4 space-x-3">
+                                <a href="#" class="bg-primary-600 hover:bg-primary-700 text-white text-sm px-4 py-2 rounded-lg font-medium transition-colors">
+                                    View Details
+                                </a>
+                                {% if not booking.has_passed %}
+                                <a href="#" class="bg-white border border-primary-300 text-primary-600 hover:bg-primary-50 text-sm px-4 py-2 rounded-lg font-medium transition-colors">
+                                    Modify Booking
+                                </a>
+                                {% else %}
+                                <a href="#" class="bg-white border border-secondary-300 text-secondary-600 hover:bg-secondary-50 text-sm px-4 py-2 rounded-lg font-medium transition-colors">
+                                    Leave Review
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-12">
+                <div class="bg-primary-50 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-suitcase text-4xl text-primary-400"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">No Trips Yet</h3>
+                <p class="text-gray-600 mb-6 max-w-md mx-auto">Looks like you haven't booked any trips yet. Start exploring destinations and create unforgettable memories.</p>
+                <a href="{% url 'destinations' %}" class="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                    <i class="fas fa-search mr-2"></i> Explore Destinations
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Favorites Tab -->
+        <div x-show="activeTab === 'favorites'" class="bg-white rounded-xl shadow-sm p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-semibold text-gray-800">Saved Items</h3>
+                <div class="flex space-x-2">
+                    <select class="bg-gray-100 text-gray-700 px-3 py-1 rounded-md text-sm font-medium border-none focus:ring-2 focus:ring-primary-500">
+                        <option>All Items</option>
+                        <option>Destinations</option>
+                        <option>Hotels</option>
+                        <option>Attractions</option>
+                        <option>Excursions</option>
+                    </select>
+                </div>
+            </div>
+            
+            {% if user.favorites.exists %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for favorite in user.favorites.all %}
+                {# --- НАЧАЛО ИСПРАВЛЕННОЙ КАРТОЧКИ ИЗБРАННОГО --- #}
+                {% with item=favorite.destination|default:favorite.hotel|default:favorite.attraction|default:favorite.excursion %}
+                {# ^-- Создаем переменную item, которая будет ссылаться на реальный объект (Destination, Hotel и т.д.) --^ #}
+                {% if item %} {# Убедимся, что объект найден #}
+                <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition duration-300 overflow-hidden border border-gray-100 group">
+                    <div class="relative h-48">
+                        {# Отображение картинки #}
+                        {% if item.image %}
+                        <img src="{{ item.image.url }}" alt="{{ item.name }}" class="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        {% else %}
+                        <div class="absolute inset-0 bg-gradient-to-r from-primary-400 to-primary-600 flex items-center justify-center">
+                            {# Можно добавить разные иконки в зависимости от типа item #}
+                            {% if favorite.destination %}<i class="fas fa-globe-americas text-4xl text-white"></i>
+                            {% elif favorite.hotel %}<i class="fas fa-hotel text-4xl text-white"></i>
+                            {% elif favorite.attraction %}<i class="fas fa-landmark text-4xl text-white"></i>
+                            {% elif favorite.excursion %}<i class="fas fa-hiking text-4xl text-white"></i>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                        <div class="absolute top-3 right-3">
+                            {# Кнопка удаления из избранного (требует JS, как и раньше) #}
+                            {# Можно использовать тот же JS, что и для страницы экскурсий, но с другим URL или логикой #}
+                            <button type="button" class="js-remove-favorite-btn bg-white rounded-full p-2 shadow-md text-pink-500 hover:text-pink-600 transition-colors" data-favorite-id="{{ favorite.id }}">
+                                <i class="fas fa-heart"></i> {# Заполненное сердце для удаления #}
+                            </button>
+                        </div>
+                        <div class="absolute bottom-0 left-0 p-4 w-full">
+                            {# Отображение типа элемента #}
+                            <span class="inline-flex items-center bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm mb-2">
+                                {% if favorite.destination %}Destination
+                                {% elif favorite.hotel %}Hotel
+                                {% elif favorite.attraction %}Attraction
+                                {% elif favorite.excursion %}Excursion
+                                {% endif %}
+                            </span>
+                            {# Отображение имени #}
+                            <h3 class="text-xl font-bold text-white">{{ item.name }}</h3>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        {# Отображение локации (если есть) #}
+                        {% if item.destination %} {# У отеля, достопримечательности, экскурсии есть ссылка на destination #}
+                        <div class="flex items-center text-gray-600 mb-3 text-sm">
+                            <i class="fas fa-map-marker-alt text-primary-500 mr-1.5"></i>
+                            {{ item.destination.name }}, {{ item.destination.country }}
+                        </div>
+                        {% elif favorite.destination %} {# Если сам элемент - это Destination #}
+                         <div class="flex items-center text-gray-600 mb-3 text-sm">
+                            <i class="fas fa-map-marker-alt text-primary-500 mr-1.5"></i>
+                            {{ item.name }}, {{ item.country }}
+                        </div>
+                        {% endif %}
+
+                    {# Отображение описания (если есть) #}
+                    {% if item.description %}
+                    <p class="text-gray-600 mb-4 line-clamp-2 text-sm">{{ item.description|truncatechars:100 }}</p>
+                    {% endif %}
+
+                    <div class="flex justify-between items-center">
+                        {# --- ИСПРАВЛЕННАЯ ССЫЛКА "View Details" --- #}
+                        {% if favorite.destination %}
+                            <a href="{% url 'destination_detail' item.id %}" class="text-primary-600 hover:text-primary-800 font-medium text-sm flex items-center">
+                        {% elif favorite.hotel %}
+                            <a href="{% url 'hotel_detail' item.id %}" class="text-primary-600 hover:text-primary-800 font-medium text-sm flex items-center">
+                        {% elif favorite.attraction %}
+                            <a href="{% url 'attraction_detail' item.id %}" class="text-primary-600 hover:text-primary-800 font-medium text-sm flex items-center">
+                        {% elif favorite.excursion %}
+                            <a href="{% url 'excursion_detail' item.id %}" class="text-primary-600 hover:text-primary-800 font-medium text-sm flex items-center">
+                        {% endif %}
+                            View Details <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                        </a>
+                        {# ------------------------------------------ #}
+                        <span class="text-sm text-gray-500">Saved {{ favorite.created_at|timesince }} ago</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %} {# Конец if item #}
+            {% endwith %} {# Конец with item #}
+            {# --- КОНЕЦ ИСПРАВЛЕННОЙ КАРТОЧКИ ИЗБРАННОГО --- #}
+            {% endfor %} {# Конец цикла for favorite #}
+            </div>
+            {% else %}
+            <div class="text-center py-12">
+                <div class="bg-primary-50 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+                    <i class="far fa-heart text-4xl text-primary-400"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">No Favorites Yet</h3>
+                <p class="text-gray-600 mb-6 max-w-md mx-auto">Start saving your favorite destinations, hotels, attractions, and excursions to access them easily later.</p>
+                <a href="{% url 'destinations' %}" class="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                    <i class="fas fa-search mr-2"></i> Start Exploring
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Reviews Tab -->
+        <div x-show="activeTab === 'reviews'" class="bg-white rounded-xl shadow-sm p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-semibold text-gray-800">My Reviews</h3>
+                <div class="flex space-x-2">
+                    <select class="bg-gray-100 text-gray-700 px-3 py-1 rounded-md text-sm font-medium border-none focus:ring-2 focus:ring-primary-500">
+                        <option>All Reviews</option>
+                        <option>Highest Rated</option>
+                        <option>Lowest Rated</option>
+                        <option>Most Recent</option>
+                    </select>
+                </div>
+            </div>
+            
+            {% if user.reviews.exists %}
+            <div class="space-y-6">
+                {% for review in user.reviews.all %}
+                <div class="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 mr-4">
+                            {% if review.item.image %}
+                            <img src="{{ review.item.image.url }}" alt="{{ review.item.name }}" class="w-16 h-16 object-cover rounded-lg">
+                            {% else %}
+                            <div class="w-16 h-16 bg-gradient-to-r from-primary-400 to-primary-600 flex items-center justify-center rounded-lg">
+                                <i class="fas fa-star text-xl text-white"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow">
+                            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                                <div>
+                                    <span class="inline-flex items-center bg-primary-50 text-primary-700 text-xs px-2 py-1 rounded-full mb-1">
+                                        {{ review.get_item_type_display }}
+                                    </span>
+                                    <h4 class="text-lg font-semibold text-gray-800">{{ review.item.name }}</h4>
+                                </div>
+                                <div class="flex md:flex-col md:items-end">
+                                    <div class="flex items-center">
+                                        {% for i in "12345" %}
+                                        <i class="{% if forloop.counter <= review.rating %}fas{% else %}far{% endif %} fa-star text-yellow-400 text-sm"></i>
+                                        {% endfor %}
+                                    </div>
+                                    <span class="text-sm text-gray-500 mt-1">{{ review.created_at|date:"M d, Y" }}</span>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 mt-2">{{ review.comment }}</p>
+                            <div class="flex mt-4 space-x-3">
+                                <a href="#" class="text-primary-600 hover:text-primary-800 text-sm font-medium flex items-center">
+                                    <i class="fas fa-edit mr-1"></i> Edit Review
+                                </a>
+                                <a href="#" class="text-gray-600 hover:text-gray-800 text-sm font-medium flex items-center">
+                                    <i class="fas fa-trash-alt mr-1"></i> Delete
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-12">
+                <div class="bg-primary-50 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-star text-4xl text-primary-400"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">No Reviews Yet</h3>
+                <p class="text-gray-600 mb-6 max-w-md mx-auto">Share your experiences by reviewing destinations, hotels, attractions, and excursions you've visited.</p>
+                <a href="{% url 'bookings' %}" class="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                    <i class="fas fa-history mr-2"></i> View Past Trips
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Alpine.js is included in base template
+</script>
+{% endblock %} 

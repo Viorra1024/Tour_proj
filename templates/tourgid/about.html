@@ -1,0 +1,148 @@
+{% extends "tourgid/base.html" %}
+
+{% block title %}About Us - Tourist Guide{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="relative bg-blue-600 text-white py-16">
+    <div class="container mx-auto px-6 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6">About Tourist Guide</h1>
+        <p class="text-xl max-w-3xl mx-auto">Your comprehensive platform for exploring destinations, finding accommodations, and booking exciting excursions worldwide.</p>
+    </div>
+</div>
+
+<!-- Mission Statement -->
+<div class="container mx-auto px-6 py-16">
+    <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Our Mission</h2>
+        <p class="text-lg text-gray-700 leading-relaxed mb-8">
+            Tourist Guide was created with a simple mission: to make travel planning easier, more accessible, and more enjoyable for everyone. We believe that exploring the world should be a seamless experience, from discovering new destinations to booking the perfect hotel and finding exciting activities.
+        </p>
+        <p class="text-lg text-gray-700 leading-relaxed">
+            Our platform brings together all the essential travel information you need in one place, with honest reviews, detailed descriptions, and easy booking options. Whether you're planning a weekend getaway or a month-long adventure, Tourist Guide is your trusted companion for creating unforgettable travel experiences.
+        </p>
+    </div>
+</div>
+
+<!-- Features -->
+<div class="bg-gray-50 py-16">
+    <div class="container mx-auto px-6">
+        <h2 class="text-3xl font-bold text-gray-800 mb-12 text-center">Key Features</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-globe-americas text-blue-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Comprehensive Destination Guides</h3>
+                <p class="text-gray-600">
+                    Explore detailed information about destinations around the world, including climate, attractions, and travel tips.
+                </p>
+            </div>
+            
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-hotel text-blue-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Advanced Hotel Search</h3>
+                <p class="text-gray-600">
+                    Find the perfect accommodation with filters for price, rating, location, and amenities, with transparent pricing.
+                </p>
+            </div>
+            
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-hiking text-blue-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Curated Excursions</h3>
+                <p class="text-gray-600">
+                    Discover and book unique experiences and activities tailored to your interests at each destination.
+                </p>
+            </div>
+            
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-map-marked-alt text-blue-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Interactive Maps</h3>
+                <p class="text-gray-600">
+                    Visualize attractions, hotels, and excursions on interactive maps to better plan your trip logistics.
+                </p>
+            </div>
+            
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-star text-blue-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Authentic Reviews</h3>
+                <p class="text-gray-600">
+                    Read and contribute honest reviews to help fellow travelers make informed decisions.
+                </p>
+            </div>
+            
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-file-pdf text-blue-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">Personalized Travel Guides</h3>
+                <p class="text-gray-600">
+                    Generate custom travel guides based on your preferences that you can download and take with you.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Team -->
+<div class="container mx-auto px-6 py-16">
+    <h2 class="text-3xl font-bold text-gray-800 mb-12 text-center">Our Team</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="bg-white p-6 rounded-lg shadow-md text-center">
+            <div class="w-32 h-32 bg-gray-200 rounded-full mx-auto mb-6 overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Team Member" class="w-full h-full object-cover">
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-1">John Doe</h3>
+            <p class="text-blue-600 mb-4">Founder & CEO</p>
+            <p class="text-gray-600">
+                Travel enthusiast with over 15 years of experience in the tourism industry.
+            </p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md text-center">
+            <div class="w-32 h-32 bg-gray-200 rounded-full mx-auto mb-6 overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Team Member" class="w-full h-full object-cover">
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-1">Jane Smith</h3>
+            <p class="text-blue-600 mb-4">Head of Destinations</p>
+            <p class="text-gray-600">
+                Former travel writer who has visited over 50 countries across 6 continents.
+            </p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md text-center">
+            <div class="w-32 h-32 bg-gray-200 rounded-full mx-auto mb-6 overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Team Member" class="w-full h-full object-cover">
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-1">David Chen</h3>
+            <p class="text-blue-600 mb-4">Chief Technology Officer</p>
+            <p class="text-gray-600">
+                Tech guru with a passion for creating seamless digital travel experiences.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Contact -->
+<div class="bg-blue-600 text-white py-16">
+    <div class="container mx-auto px-6 text-center">
+        <h2 class="text-3xl font-bold mb-8">Get in Touch</h2>
+        <p class="text-xl max-w-3xl mx-auto mb-8">
+            Have questions, suggestions, or want to collaborate? We'd love to hear from you!
+        </p>
+        <a href="mailto:contact@touristguide.com" class="inline-block bg-white text-blue-600 font-bold py-3 px-8 rounded-full hover:bg-blue-50 transition duration-300">
+            Contact Us
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends "tourgid/base.html" %} {# <-- Убедись, что путь к базовому шаблону верный #}
+{% load static %}
+
+{% block title %}Мое избранное{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">Мое избранное</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mb-4 p-4 rounded-md {% if message.tags == 'success' %}bg-green-100 text-green-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% else %}bg-blue-100 text-blue-800{% endif %}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if favorites %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {# favorites - это список объектов Favorite из view #}
+            {% for fav in favorites %}
+                {# fav - это объект Favorite, у которого заполнено одно из полей: destination, hotel, attraction, excursion #}
+                {% with item=fav.destination|default:fav.hotel|default:fav.attraction|default:fav.excursion %}
+                {# В 'item' теперь лежит объект того, что добавлено в избранное #}
+                {% if item %} {# Доп. проверка, что объект найден #}
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 flex flex-col">
+                    <div class="relative h-52">
+                        {% with image=item.image|default:item.cover_image %} {# Пытаемся найти картинку #}
+                        {% if image %}
+                        <img src="{{ image.url }}" alt="{{ item.name }}" class="w-full h-full object-cover">
+                        {% else %}
+                        <div class="w-full h-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center">
+                            {# Иконка по умолчанию или в зависимости от типа #}
+                             {% if fav.destination %}<i class="fas fa-map-marked-alt text-white text-3xl opacity-50"></i>{% endif %}
+                             {% if fav.hotel %}<i class="fas fa-hotel text-white text-3xl opacity-50"></i>{% endif %}
+                             {% if fav.attraction %}<i class="fas fa-camera-retro text-white text-3xl opacity-50"></i>{% endif %}
+                             {% if fav.excursion %}<i class="fas fa-hiking text-white text-3xl opacity-50"></i>{% endif %}
+                        </div>
+                        {% endif %}
+                        {% endwith %}
+                         {# Тип объекта #}
+                         <div class="absolute top-3 right-3">
+                              <span class="bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded text-xs font-medium">
+                                   {% if fav.destination %}Направление{% endif %}
+                                   {% if fav.hotel %}Отель{% endif %}
+                                   {% if fav.attraction %}Место{% endif %}
+                                   {% if fav.excursion %}Экскурсия{% endif %}
+                              </span>
+                         </div>
+                    </div>
+
+                    <div class="p-4 flex flex-col flex-grow">
+                        <h3 class="font-bold text-gray-800 mb-1 text-lg">{{ item.name }}</h3>
+                        {# Доп. информация, если есть #}
+                        {% if item.destination.name %} {# Для отелей, мест, экскурсий #}
+                         <p class="text-gray-600 text-sm mb-2">{{ item.destination.name }}, {{ item.destination.country }}</p>
+                        {% elif fav.destination %} {# Для самого направления #}
+                         <p class="text-gray-600 text-sm mb-2">{{ item.city }}, {{ item.country }}</p>
+                        {% endif %}
+
+                        {# Краткое описание, если есть #}
+                        {% if item.description %}
+                        <p class="text-gray-500 text-sm mb-3 flex-grow">{{ item.description|truncatewords:15 }}</p>
+                        {% else %}
+                         <div class="flex-grow"></div> {# Занимаем место, если нет описания #}
+                        {% endif %}
+
+                        <div class="flex justify-between items-center mt-auto pt-3 border-t border-gray-100">
+                             {# Ссылка на детальную страницу объекта #}
+                             {% if fav.destination %}<a href="{% url 'destination_detail' item.id %}" class="text-primary-600 hover:text-primary-700 text-sm font-medium">Подробнее</a>{% endif %}
+                             {% if fav.hotel %}<a href="{% url 'hotel_detail' item.id %}" class="text-primary-600 hover:text-primary-700 text-sm font-medium">Подробнее</a>{% endif %}
+                             {% if fav.attraction %}<a href="{% url 'attraction_detail' item.id %}" class="text-primary-600 hover:text-primary-700 text-sm font-medium">Подробнее</a>{% endif %}
+                             {% if fav.excursion %}<a href="{% url 'excursion_detail' item.id %}" class="text-primary-600 hover:text-primary-700 text-sm font-medium">Подробнее</a>{% endif %}
+
+                             {# Форма для удаления из избранного #}
+                             <form action="{% url 'remove_from_favorites' fav.id %}" method="POST" class="inline">
+                                 {% csrf_token %}
+                                 <input type="hidden" name="next" value="{{ request.path }}"> {# Чтобы вернуться на эту же страницу #}
+                                 <button type="submit" class="text-red-500 hover:text-red-700 text-sm" title="Удалить из избранного">
+                                     <i class="fas fa-trash-alt"></i>
+                                 </button>
+                             </form>
+                        </div>
+                    </div>
+                </div>
+                {% endif %} {# end if item #}
+                {% endwith %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-16 bg-gray-50 rounded-lg">
+            <i class="far fa-heart text-6xl text-gray-300 mb-6"></i>
+            <h2 class="text-xl font-semibold text-gray-800 mb-2">Ваше избранное пока пусто</h2>
+            <p class="text-gray-600 mb-6 max-w-md mx-auto">Добавляйте понравившиеся отели, направления, экскурсии и достопримечательности, чтобы легко вернуться к ним позже.</p>
+            <a href="{% url 'destinations' %}" class="inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-5 rounded-lg transition duration-300">
+                <i class="fas fa-search mr-2"></i> Найти что-то интересное
+            </a>
+        </div>
+    {% endif %} {# end if favorites #}
+
+</div>
+{% endblock %}

@@ -1,0 +1,501 @@
+{% extends "tourgid/base.html" %}
+
+{% block title %}{{ hotel.name }} - TourGid{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Cover Image -->
+<section class="relative">
+    {% if hotel.cover_image %}
+    <div class="h-96 md:h-[500px] w-full">
+        <img src="{{ hotel.cover_image.url }}" alt="{{ hotel.name }}" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+    </div>
+    {% else %}
+    <div class="h-96 md:h-[500px] w-full bg-gradient-to-r from-primary-700 to-primary-900">
+        <div class="absolute inset-0 opacity-10 overflow-hidden">
+            <i class="fas fa-hotel text-white text-9xl absolute -bottom-10 -right-10 transform rotate-12"></i>
+            <i class="fas fa-concierge-bell text-white text-7xl absolute top-20 left-20"></i>
+            <i class="fas fa-star text-white text-5xl absolute bottom-40 left-1/4"></i>
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+    </div>
+    {% endif %}
+
+    <div class="absolute bottom-0 inset-x-0 container mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div class="flex flex-col md:flex-row md:items-end gap-4">
+            <div class="rounded-xl overflow-hidden border-4 border-white shadow-xl md:max-w-[200px]">
+                {% if hotel.image %}
+                <img src="{{ hotel.image.url }}" alt="{{ hotel.name }}" class="w-full aspect-square object-cover">
+                {% else %}
+                <div class="w-full aspect-square bg-primary-600 flex items-center justify-center">
+                    <i class="fas fa-hotel text-white text-4xl"></i>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="text-white flex-1">
+                <div class="flex items-center gap-2 mb-2">
+                    {% for i in "12345" %}
+                    <i class="fas fa-star {% if forloop.counter <= hotel.rating %}text-yellow-400{% else %}text-gray-400{% endif %}"></i>
+                    {% endfor %}
+                    <span class="bg-primary-600 text-white px-2 py-0.5 rounded-full text-sm ml-2">
+                        {{ hotel.get_accommodation_type_display }}
+                    </span>
+                </div>
+                
+                <h1 class="text-4xl font-bold mb-2">{{ hotel.name }}</h1>
+                
+                <p class="text-xl flex items-center opacity-90">
+                    <i class="fas fa-map-marker-alt mr-2 text-primary-400"></i>
+                    {{ hotel.address }}, {{ hotel.destination.name }}, {{ hotel.destination.country }}
+                </p>
+            </div>
+            
+            <div class="md:text-right">
+                <div class="bg-white/10 backdrop-blur rounded-xl p-5 text-white">
+                    <div class="mb-2">From</div>
+                    <div class="text-3xl font-bold">${{ hotel.price_per_night }}<span class="text-lg font-normal opacity-70">/night</span></div>
+                    <a href="{{ hotel.booking_url }}" target="_blank" class="mt-3 inline-block w-full text-center bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all">
+                        Book Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Nav -->
+<section class="sticky top-16 z-30 bg-white shadow-sm">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex overflow-x-auto whitespace-nowrap py-4 gap-8 -mx-4 px-4 scrollbar-hide">
+            <a href="#overview" class="text-primary-600 font-medium border-b-2 border-primary-600 pb-3">Overview</a>
+            <a href="#amenities" class="text-gray-500 hover:text-primary-600 transition-colors font-medium hover:border-b-2 hover:border-primary-600 pb-3">Amenities</a>
+            <a href="#gallery" class="text-gray-500 hover:text-primary-600 transition-colors font-medium hover:border-b-2 hover:border-primary-600 pb-3">Photos</a>
+            <a href="#location" class="text-gray-500 hover:text-primary-600 transition-colors font-medium hover:border-b-2 hover:border-primary-600 pb-3">Location</a>
+            <a href="#reviews" class="text-gray-500 hover:text-primary-600 transition-colors font-medium hover:border-b-2 hover:border-primary-600 pb-3">Reviews</a>
+            <a href="#policies" class="text-gray-500 hover:text-primary-600 transition-colors font-medium hover:border-b-2 hover:border-primary-600 pb-3">Policies</a>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="flex flex-col lg:flex-row gap-12">
+        <!-- Main Column -->
+        <div class="lg:w-2/3">
+            <!-- Overview Section -->
+            <section id="overview" class="mb-12">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Overview</h2>
+                <div class="prose max-w-none text-gray-700">
+                    <p>{{ hotel.description }}</p>
+                </div>
+            </section>
+            
+            <!-- Amenities Section -->
+            <section id="amenities" class="mb-12">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Amenities</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                    {% if hotel.amenities.wifi %}
+                    <div class="flex items-center">
+                        <i class="fas fa-wifi text-primary-500 mr-3"></i>
+                        <span>Free WiFi</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if hotel.amenities.pool %}
+                    <div class="flex items-center">
+                        <i class="fas fa-swimming-pool text-primary-500 mr-3"></i>
+                        <span>Swimming Pool</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if hotel.amenities.parking %}
+                    <div class="flex items-center">
+                        <i class="fas fa-parking text-primary-500 mr-3"></i>
+                        <span>Free Parking</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if hotel.amenities.spa %}
+                    <div class="flex items-center">
+                        <i class="fas fa-spa text-primary-500 mr-3"></i>
+                        <span>Spa & Wellness</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if hotel.amenities.restaurant %}
+                    <div class="flex items-center">
+                        <i class="fas fa-utensils text-primary-500 mr-3"></i>
+                        <span>Restaurant</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if hotel.amenities.bar %}
+                    <div class="flex items-center">
+                        <i class="fas fa-glass-martini-alt text-primary-500 mr-3"></i>
+                        <span>Bar & Lounge</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if hotel.amenities.fitness %}
+                    <div class="flex items-center">
+                        <i class="fas fa-dumbbell text-primary-500 mr-3"></i>
+                        <span>Fitness Center</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if hotel.amenities.breakfast %}
+                    <div class="flex items-center">
+                        <i class="fas fa-coffee text-primary-500 mr-3"></i>
+                        <span>Breakfast Included</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if hotel.amenities.air_conditioning %}
+                    <div class="flex items-center">
+                        <i class="fas fa-snowflake text-primary-500 mr-3"></i>
+                        <span>Air Conditioning</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+            
+            <!-- Gallery Section -->
+            <section id="gallery" class="mb-12">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Photo Gallery</h2>
+                
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {% if hotel.image %}
+                    <div class="aspect-square overflow-hidden rounded-xl">
+                        <img src="{{ hotel.image.url }}" alt="{{ hotel.name }}" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500">
+                    </div>
+                    {% endif %}
+                    
+                    {% if hotel.cover_image %}
+                    <div class="aspect-square overflow-hidden rounded-xl">
+                        <img src="{{ hotel.cover_image.url }}" alt="{{ hotel.name }}" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500">
+                    </div>
+                    {% endif %}
+                    
+                    {% if hotel.gallery_images %}
+                        {% for image_url in hotel.gallery_images %}
+                        <div class="aspect-square overflow-hidden rounded-xl">
+                            <img src="{{ image_url }}" alt="{{ hotel.name }}" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500">
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </section>
+            
+            <!-- Location Section -->
+            <section id="location" class="mb-12">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Location</h2>
+                
+                {% if hotel.latitude and hotel.longitude %}
+                <div class="h-96 rounded-xl overflow-hidden mb-4">
+                    <!-- Map will be loaded here -->
+                    <div id="hotelMap" class="w-full h-full"></div>
+                </div>
+                {% endif %}
+                
+                <div class="bg-gray-50 p-6 rounded-xl">
+                    <h3 class="font-bold text-gray-800 mb-3">Address</h3>
+                    <p class="text-gray-700">{{ hotel.address }}, {{ hotel.destination.name }}, {{ hotel.destination.country }}</p>
+                    
+                    <div class="border-t border-gray-200 my-4"></div>
+                    
+                    <h3 class="font-bold text-gray-800 mb-3">Nearby Attractions</h3>
+                    <ul class="space-y-2">
+                        {% for attraction in nearby_attractions %}
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt text-primary-500 mt-1 mr-3"></i>
+                            <div>
+                                <div class="font-medium">{{ attraction.name }}</div>
+                                <div class="text-sm text-gray-600">{{ attraction.distance_to_hotel }} km away</div>
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="text-gray-500">No nearby attractions found.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </section>
+            
+            <!-- Reviews Section -->
+            <section id="reviews" class="mb-12">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">Guest Reviews</h2>
+                    <button class="text-primary-600 hover:text-primary-700 font-medium" id="writeReviewBtn">
+                        <i class="fas fa-pen mr-2"></i> Write a Review
+                    </button>
+                </div>
+                
+                <!-- Review Form (hidden by default) -->
+                <div id="reviewForm" class="hidden mb-8 bg-gray-50 p-6 rounded-xl">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Write Your Review</h3>
+                    <form action="{% url 'add_review' content_type='hotel' content_id=hotel.id %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="hotel_id" value="{{ hotel.id }}">
+                        
+                        <div class="mb-4">
+                            <label class="block text-gray-700 mb-2">Your Name</label>
+                            <input type="text" name="author" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" required>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-gray-700 mb-2">Rating</label>
+                            <div class="flex items-center gap-1">
+                                <input type="hidden" name="rating" id="ratingInput" value="5">
+                                <div id="ratingStars" class="flex text-2xl">
+                                    <i class="fas fa-star text-yellow-400 cursor-pointer" data-value="1"></i>
+                                    <i class="fas fa-star text-yellow-400 cursor-pointer" data-value="2"></i>
+                                    <i class="fas fa-star text-yellow-400 cursor-pointer" data-value="3"></i>
+                                    <i class="fas fa-star text-yellow-400 cursor-pointer" data-value="4"></i>
+                                    <i class="fas fa-star text-yellow-400 cursor-pointer" data-value="5"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block text-gray-700 mb-2">Your Review</label>
+                            <textarea name="comment" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500" required></textarea>
+                        </div>
+                        
+                        <div class="flex justify-end gap-3">
+                            <button type="button" id="cancelReviewBtn" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50">
+                                Cancel
+                            </button>
+                            <button type="submit" class="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700">
+                                Submit Review
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Reviews List -->
+                <div class="space-y-6">
+                    {% for review in hotel.reviews.all %}
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <div class="font-bold text-gray-800">{{ review.author }}</div>
+                                <div class="text-sm text-gray-500">{{ review.created_at|date:"F j, Y" }}</div>
+                            </div>
+                            <div class="flex">
+                                {% for i in "12345" %}
+                                <i class="fas fa-star {% if forloop.counter <= review.rating %}text-yellow-400{% else %}text-gray-200{% endif %}"></i>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <p class="text-gray-700">{{ review.comment }}</p>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-8 bg-gray-50 rounded-xl">
+                        <i class="far fa-comment-dots text-5xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500 text-lg">No reviews yet.</p>
+                        <p class="text-gray-400 mt-1">Be the first to share your experience!</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="lg:w-1/3">
+            <!-- Booking Box (Sticky) -->
+            <div class="sticky top-32">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+                    <div class="p-6 border-b border-gray-100">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Book Your Stay</h3>
+                        
+                        <form>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm mb-2">Check-in</label>
+                                <input type="date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm mb-2">Check-out</label>
+                                <input type="date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm mb-2">Guests</label>
+                                <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                    <option value="1">1 Adult</option>
+                                    <option value="2">2 Adults</option>
+                                    <option value="3">3 Adults</option>
+                                    <option value="4">4 Adults</option>
+                                    <option value="5">5+ Adults</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <label class="block text-gray-700 text-sm mb-2">Rooms</label>
+                                <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                    <option value="1">1 Room</option>
+                                    <option value="2">2 Rooms</option>
+                                    <option value="3">3 Rooms</option>
+                                    <option value="4">4+ Rooms</option>
+                                </select>
+                            </div>
+                            
+                            <a href="{{ hotel.booking_url }}" target="_blank" class="block w-full text-center bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-lg shadow hover:shadow-lg transition-all">
+                                Check Availability
+                            </a>
+                        </form>
+                    </div>
+                    
+                    <div class="p-6 bg-gray-50">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-600">From ${{ hotel.price_per_night }} / night</span>
+                            <span class="text-gray-600">+ taxes & fees</span>
+                        </div>
+                        
+                        <div class="flex items-center text-green-600 text-sm">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <span>Free cancellation available</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Destination Card -->
+                {% if hotel.destination %}
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div class="h-48 relative">
+                        {% if hotel.destination.image %}
+                        <img src="{{ hotel.destination.image.url }}" alt="{{ hotel.destination.name }}" class="w-full h-full object-cover">
+                        {% else %}
+                        <div class="w-full h-full bg-gradient-to-r from-primary-400 to-primary-600 flex items-center justify-center">
+                            <i class="fas fa-map-marker-alt text-white text-3xl"></i>
+                        </div>
+                        {% endif %}
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-4">
+                            <div class="text-white text-lg font-bold">{{ hotel.destination.name }}</div>
+                            <div class="text-white/80 text-sm">{{ hotel.destination.country }}</div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <p class="text-gray-600 text-sm mb-4">{{ hotel.destination.description|truncatechars:120 }}</p>
+                        <a href="{% url 'destination_detail' hotel.destination.id %}" class="text-primary-600 hover:text-primary-700 text-sm font-medium flex items-center">
+                            Explore {{ hotel.destination.name }}
+                            <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Similar Hotels -->
+<section class="bg-gray-50 py-16">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-8">Similar Hotels</h2>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {% for similar_hotel in similar_hotels %}
+            <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all">
+                <div class="relative h-52">
+                    {% if similar_hotel.image %}
+                    <img src="{{ similar_hotel.image.url }}" alt="{{ similar_hotel.name }}" class="w-full h-full object-cover">
+                    {% else %}
+                    <div class="w-full h-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center">
+                        <i class="fas fa-hotel text-white text-3xl"></i>
+                    </div>
+                    {% endif %}
+                    <div class="absolute top-3 left-3">
+                        <span class="bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded text-xs font-medium">
+                            <i class="fas fa-star text-yellow-400 mr-1"></i> {{ similar_hotel.rating }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="p-4">
+                    <h3 class="font-bold text-gray-800 mb-1">{{ similar_hotel.name }}</h3>
+                    <p class="text-gray-600 text-sm mb-2">{{ similar_hotel.destination.name }}, {{ similar_hotel.destination.country }}</p>
+                    
+                    <div class="flex justify-between items-center mt-3">
+                        <div class="text-gray-800 font-bold">${{ similar_hotel.price_per_night }}<span class="text-sm font-normal text-gray-500">/night</span></div>
+                        <a href="{% url 'hotel_detail' similar_hotel.id %}" class="text-primary-600 hover:text-primary-700 text-sm font-medium">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-4 text-center py-8">
+                <p class="text-gray-500">No similar hotels found.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Review form toggle
+        const writeReviewBtn = document.getElementById('writeReviewBtn');
+        const cancelReviewBtn = document.getElementById('cancelReviewBtn');
+        const reviewForm = document.getElementById('reviewForm');
+        
+        if (writeReviewBtn && cancelReviewBtn && reviewForm) {
+            writeReviewBtn.addEventListener('click', function() {
+                reviewForm.classList.remove('hidden');
+            });
+            
+            cancelReviewBtn.addEventListener('click', function() {
+                reviewForm.classList.add('hidden');
+            });
+        }
+        
+        // Star rating functionality
+        const ratingStars = document.querySelectorAll('#ratingStars i');
+        const ratingInput = document.getElementById('ratingInput');
+        
+        if (ratingStars.length && ratingInput) {
+            ratingStars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const value = parseInt(this.dataset.value);
+                    ratingInput.value = value;
+                    
+                    // Update stars visualization
+                    ratingStars.forEach(s => {
+                        if (parseInt(s.dataset.value) <= value) {
+                            s.classList.add('text-yellow-400');
+                            s.classList.remove('text-gray-300');
+                        } else {
+                            s.classList.remove('text-yellow-400');
+                            s.classList.add('text-gray-300');
+                        }
+                    });
+                });
+            });
+        }
+        
+        // Initialize map if coordinates are available
+        {% if hotel.latitude and hotel.longitude %}
+        if (typeof L !== 'undefined') {
+            const map = L.map('hotelMap').setView([{{ hotel.latitude }}, {{ hotel.longitude }}], 15);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            const hotelIcon = L.icon({
+                iconUrl: '/static/img/hotel-marker.png',
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
+            });
+            
+            L.marker([{{ hotel.latitude }}, {{ hotel.longitude }}], {icon: hotelIcon})
+                .addTo(map)
+                .bindPopup("{{ hotel.name }}");
+        }
+        {% endif %}
+    });
+</script>
+{% endblock %}
+{% endblock %} 

@@ -1,0 +1,29 @@
+{% extends "tourgid/base.html" %}
+
+{% block title %}Home - Tourist Guide{% endblock %}
+
+{% block content %}
+<div class="text-center py-16">
+    <h1 class="text-4xl font-bold text-blue-700">Welcome to Tourist Guide</h1>
+    <p class="text-lg text-gray-700 mt-4">Find the best destinations, hotels, and attractions for your next trip!</p>
+    <a href="/destinations/" class="mt-6 inline-block bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700">Explore Now</a>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+    <div class="bg-white p-6 rounded-lg shadow-md text-center">
+        <h2 class="text-2xl font-semibold text-blue-600">Destinations</h2>
+        <p class="text-gray-600 mt-2">Discover amazing travel destinations.</p>
+        <a href="/destinations/" class="text-blue-500 mt-4 inline-block hover:underline">View more</a>
+    </div>
+    <div class="bg-white p-6 rounded-lg shadow-md text-center">
+        <h2 class="text-2xl font-semibold text-blue-600">Hotels</h2>
+        <p class="text-gray-600 mt-2">Find and book top-rated hotels.</p>
+        <a href="/hotels/" class="text-blue-500 mt-4 inline-block hover:underline">View more</a>
+    </div>
+    <div class="bg-white p-6 rounded-lg shadow-md text-center">
+        <h2 class="text-2xl font-semibold text-blue-600">Attractions</h2>
+        <p class="text-gray-600 mt-2">Explore famous attractions worldwide.</p>
+        <a href="{% url 'attractions' %}" class="text-blue-500 mt-4 inline-block hover:underline">View more</a>
+    </div>
+</div>
+{% endblock %}

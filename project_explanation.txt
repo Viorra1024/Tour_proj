@@ -1,0 +1,187 @@
+TourGid - A Complete Project Guide
+============================
+
+Hey there! 👋 This guide will help you understand how our tourist directory website works. I'll explain everything in simple terms.
+
+1. What is This Project? 🌍
+---------------------------
+TourGid is a website where people can:
+- Find cool places to visit around the world
+- Book hotels
+- Read about tourist attractions
+- Plan their trips
+- Write reviews about places they've visited
+- Save their favorite places
+Think of it like TripAdvisor or Booking.com, but our own version!
+
+2. Project Structure 📁
+----------------------
+Let's break down the main folders and files:
+
+/tourgid/                  # Main project folder
+├── tours/                 # Main app folder (where most of our code lives)
+│   ├── models/           # Database structure files
+│   ├── views/            # Files that control what users see
+│   ├── templates/        # HTML files (what the website looks like)
+│   ├── static/           # Images, CSS, JavaScript files
+│   └── api/              # Files for our web API
+├── media/                # Where uploaded images are stored
+├── static/               # Where static files are collected
+└── templates/            # Global HTML templates
+
+3. Important Files and What They Do 📝
+------------------------------------
+
+a) Database Files (models.py):
+----------------------------
+- destinations.py: Stores information about tourist destinations (cities, countries, etc.)
+- hotels.py: Stores hotel information (name, location, prices, ratings)
+- attractions.py: Stores tourist attractions (museums, parks, etc.)
+- reviews.py: Stores user reviews and ratings
+- bookings.py: Handles hotel bookings
+- guides.py: Stores automatically generated city guides
+- favorites.py: Keeps track of users' favorite places
+
+b) View Files (views.py):
+-----------------------
+These files control what happens when you visit different pages:
+- HomeView: Shows the main page
+- DestinationView: Shows list of destinations and details
+- HotelView: Shows hotels and lets you book them
+- AttractionView: Shows tourist attractions
+- ReviewView: Handles creating and showing reviews
+- BookingView: Handles hotel bookings
+- UserProfileView: Shows user profiles and favorites
+
+c) Template Files (in templates/):
+-------------------------------
+These are HTML files that make the website look pretty:
+- base.html: The main template all pages use
+- home.html: The homepage
+- destinations.html: The page showing all destinations
+- hotels.html: The page showing hotels
+- profile.html: User profile page
+- booking.html: Booking form page
+
+d) Special Features 🌟
+--------------------
+
+1. Automatic Tasks (Celery):
+   - Updates hotel ratings every night
+   - Sends email confirmations for bookings
+   - Creates city guides automatically
+   - Checks booking statuses regularly
+
+2. Maps Integration:
+   - Shows hotels and attractions on a map
+   - Helps calculate distances
+   - Provides directions to places
+
+3. Search and Filters:
+   - Search for destinations, hotels, or attractions
+   - Filter by price, rating, location
+   - Sort results by different criteria
+
+4. User Features:
+   - Create an account
+   - Write reviews
+   - Save favorite places
+   - Book hotels
+   - Get email confirmations
+
+4. How Things Work Together 🔄
+----------------------------
+
+1. When someone visits the website:
+   - They see the homepage with featured destinations
+   - Can search for places they want to visit
+   - Browse hotels and attractions
+
+2. When someone searches:
+   - The search goes to our database
+   - Filters are applied (price, rating, etc.)
+   - Results are shown on the page
+   - A map shows where everything is
+
+3. When someone books a hotel:
+   - They fill out the booking form
+   - The system checks if rooms are available
+   - Creates a booking record
+   - Sends confirmation emails
+   - Updates the hotel's availability
+
+4. When someone writes a review:
+   - The review is saved in the database
+   - The hotel's rating is updated
+   - The review appears on the hotel's page
+
+5. Technical Details for Developers 🔧
+-----------------------------------
+
+Key Technologies Used:
+1. Django: The main framework that runs everything
+2. PostgreSQL: The database that stores all information
+3. Redis: Helps with background tasks and caching
+4. Celery: Runs automated tasks
+5. Google Maps API: Provides maps and location services
+6. REST API: Allows other applications to use our data
+
+Important Files for Setup:
+1. requirements.txt: Lists all Python packages needed
+2. .env: Contains secret settings (passwords, API keys)
+3. .gitignore: Tells Git what files to ignore
+4. manage.py: The command center for Django
+
+6. Common Tasks Guide 📋
+----------------------
+
+How to Add New Content:
+1. Log in to admin panel (http://localhost:8000/admin)
+2. Choose what you want to add (hotel, destination, etc.)
+3. Fill in the information
+4. Save it
+
+How to Update Content:
+1. Find the item in admin panel
+2. Click to edit
+3. Make changes
+4. Save changes
+
+How to Handle Bookings:
+1. Bookings appear in admin panel
+2. Check new bookings regularly
+3. Update status as needed
+4. System sends automatic updates to users
+
+7. Troubleshooting 🔍
+-------------------
+
+Common Issues:
+1. "Can't connect to database"
+   - Check if PostgreSQL is running
+   - Verify database settings in .env
+
+2. "Images not showing"
+   - Check if media folder exists
+   - Verify permissions
+   - Run collectstatic command
+
+3. "Email not sending"
+   - Check email settings in .env
+   - Verify email service is working
+
+4. "Maps not working"
+   - Check Google Maps API key
+   - Verify it's set in .env file
+
+Remember: Always check the logs (in /logs folder) when something goes wrong!
+
+8. Security Notes 🔒
+------------------
+- Never share your .env file
+- Keep API keys secret
+- Use strong passwords
+- Regular backups are important
+- Update packages regularly
+
+I hope this helps you understand how everything works! If you have questions, check the README.md file or ask for help. Good luck! 😊 

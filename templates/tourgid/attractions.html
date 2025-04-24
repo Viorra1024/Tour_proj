@@ -1,0 +1,365 @@
+{% extends "tourgid/base.html" %}
+{% load tours_extras %}
+
+{% block title %}Attractions - TourGid{% endblock %}
+
+{% block content %}
+<!-- Attractions Header -->
+<div class="relative">
+    <div class="w-full h-[300px] rounded-xl overflow-hidden shadow-lg">
+        <div class="absolute inset-0 bg-gradient-to-r from-primary-900/90 to-primary-700/70 z-10"></div>
+        <img src="https://images.unsplash.com/photo-1558383817-c854e4ffa4c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1770&q=80" alt="Tourist attractions" class="absolute inset-0 w-full h-full object-cover">
+        <div class="absolute inset-0 flex flex-col justify-center p-6 z-20">
+            <div class="max-w-6xl mx-auto w-full">
+                <span class="inline-block px-3 py-1 bg-secondary-500 text-white text-sm rounded-full mb-4">Must See</span>
+                <h1 class="text-3xl md:text-5xl font-bold text-white mb-4">Discover Amazing Attractions</h1>
+                <p class="text-lg text-white/90 max-w-2xl">Explore iconic landmarks, natural wonders, and unforgettable experiences around the world.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters and Search Section -->
+<div class="max-w-6xl mx-auto -mt-10 bg-white rounded-xl shadow-lg p-6 md:p-8 mb-10 relative z-20">
+    <form method="GET" action="{% url 'attractions' %}" class="grid grid-cols-1 md:grid-cols-5 gap-6">
+        <div class="md:col-span-2">
+            <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" id="search" name="search" value="{{ request.GET.search|default:'' }}"
+                    placeholder="Attraction name or location" class="w-full pl-10 py-3 px-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+            </div>
+        </div>
+        <div>
+            <label for="destination" class="block text-sm font-medium text-gray-700 mb-1">Destination</label>
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                    <i class="fas fa-map-marker-alt"></i>
+                </span>
+                <select id="destination" name="destination" class="w-full pl-10 py-3 px-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none">
+                    <option value="">All Destinations</option>
+                    {% for destination in destinations %}
+                    <option value="{{ destination.id }}" {% if request.GET.destination == destination.id|stringformat:"i" %}selected{% endif %}>
+                        {{ destination.name }}, {{ destination.country }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500">
+                    <i class="fas fa-chevron-down"></i>
+                </span>
+            </div>
+        </div>
+        <div>
+            <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                    <i class="fas fa-monument"></i>
+                </span>
+                <select id="category" name="category" class="w-full pl-10 py-3 px-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none">
+                    <option value="">All Categories</option>
+                    <option value="Landmark" {% if request.GET.category == 'Landmark' %}selected{% endif %}>Landmark</option>
+                    <option value="Museum" {% if request.GET.category == 'Museum' %}selected{% endif %}>Museum</option>
+                    <option value="Park" {% if request.GET.category == 'Park' %}selected{% endif %}>Park</option>
+                    <option value="Natural Wonder" {% if request.GET.category == 'Natural Wonder' %}selected{% endif %}>Natural Wonder</option>
+                    <option value="Historical Site" {% if request.GET.category == 'Historical Site' %}selected{% endif %}>Historical Site</option>
+                    <option value="Entertainment" {% if request.GET.category == 'Entertainment' %}selected{% endif %}>Entertainment</option>
+                </select>
+                <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500">
+                    <i class="fas fa-chevron-down"></i>
+                </span>
+            </div>
+        </div>
+        <div>
+            <label class="invisible block text-sm font-medium text-gray-700 mb-1">Filter</label>
+            <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-4 rounded-lg transition duration-300 flex items-center justify-center shadow-sm hover:shadow-md">
+                <i class="fas fa-filter mr-2"></i> Apply Filters
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Attractions List -->
+<div class="max-w-6xl mx-auto mb-16">
+    <div class="flex justify-between items-center mb-8">
+        <h2 class="text-2xl font-bold text-gray-800">{{ attractions.paginator.count }} Attractions Found</h2>
+        <div class="flex items-center text-sm">
+            <label for="sort" class="mr-2 text-gray-600">Sort by:</label>
+            <select id="sort" name="sort" class="py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none bg-white text-gray-700" onchange="window.location.href=this.value">
+                <option value="{% url 'attractions' %}?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.destination %}destination={{ request.GET.destination }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}sort=name" {% if request.GET.sort == 'name' or not request.GET.sort %}selected{% endif %}>Name (A-Z)</option>
+                <option value="{% url 'attractions' %}?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.destination %}destination={{ request.GET.destination }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}sort=popularity" {% if request.GET.sort == 'popularity' %}selected{% endif %}>Popularity</option>
+                <option value="{% url 'attractions' %}?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.destination %}destination={{ request.GET.destination }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}sort=ticket_price" {% if request.GET.sort == 'ticket_price' %}selected{% endif %}>Price (Low to High)</option>
+            </select>
+            <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500">
+                <i class="fas fa-chevron-down"></i>
+            </span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+        {% for attraction in attractions %}
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover-lift hover:shadow-lg transition duration-300 group">
+            <div class="relative h-56">
+                {% if attraction.image %}
+                <img src="{{ attraction.image.url }}" alt="{{ attraction.name }}" class="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-500">
+                {% else %}
+                <div class="absolute inset-0 bg-gradient-to-r from-primary-400 to-primary-600 flex items-center justify-center">
+                    <i class="fas fa-camera text-4xl text-white"></i>
+                </div>
+                {% endif %}
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                <div class="absolute bottom-0 left-0 p-4 w-full">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="inline-flex items-center bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm">
+                            <i class="fas fa-map-marker-alt mr-1"></i> {{ attraction.destination.name }}
+                        </span>
+                        <span class="inline-flex items-center bg-secondary-500 text-white px-3 py-1 rounded-full text-sm">
+                            {{ attraction.category }}
+                        </span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white">{{ attraction.name }}</h3>
+                </div>
+            </div>
+            <div class="p-5">
+                <div class="flex justify-between items-center mb-3">
+                    <div class="flex items-center">
+                        <div class="text-sm text-gray-600 flex items-center">
+                            <i class="fas fa-clock text-primary-500 mr-1"></i>
+                            {{ attraction.recommended_duration }}
+                        </div>
+                    </div>
+                    {% if attraction.ticket_price > 0 %}
+                    <span class="font-semibold text-primary-600">${{ attraction.ticket_price }}</span>
+                    {% else %}
+                    <span class="font-semibold text-green-600">Free Entry</span>
+                    {% endif %}
+                </div>
+                <p class="text-gray-600 mb-4 line-clamp-3">{{ attraction.description|truncatechars:150 }}</p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    {% if attraction.is_must_see %}
+                    <span class="bg-primary-50 text-primary-700 text-xs px-2 py-1 rounded-full flex items-center">
+                        <i class="fas fa-star mr-1"></i> Must See
+                    </span>
+                    {% endif %}
+                    {% if attraction.is_family_friendly %}
+                    <span class="bg-primary-50 text-primary-700 text-xs px-2 py-1 rounded-full flex items-center">
+                        <i class="fas fa-child mr-1"></i> Family Friendly
+                    </span>
+                    {% endif %}
+                    {% if attraction.features.indoor %}
+                    <span class="bg-primary-50 text-primary-700 text-xs px-2 py-1 rounded-full flex items-center">
+                        <i class="fas fa-door-closed mr-1"></i> Indoor
+                    </span>
+                    {% endif %}
+                    {% if attraction.is_accessible %}
+                    <span class="bg-primary-50 text-primary-700 text-xs px-2 py-1 rounded-full flex items-center">
+                        <i class="fas fa-wheelchair mr-1"></i> Accessible
+                    </span>
+                    {% endif %}
+                </div>
+                <div class="flex gap-2">
+                    <a href="{% url 'attraction_detail' attraction.id %}" class="flex-1 block text-center bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-lg transition duration-300 shadow-sm hover:shadow">
+                        View Details
+                    </a>
+                    <button class="open-map-btn bg-white border border-primary-200 text-primary-600 hover:bg-primary-50 p-2 rounded-lg transition duration-300 shadow-sm hover:shadow"
+                            data-lat="{{ attraction.latitude }}"
+                            data-lng="{{ attraction.longitude }}"
+                            data-name="{{ attraction.name|escapejs }}">  {# Добавляем data-атрибуты #}
+                        <i class="fas fa-map-marked-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-3 py-16 text-center">
+            <div class="bg-primary-50 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-camera text-4xl text-primary-500"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-2">No Attractions Found</h3>
+            <p class="text-gray-600 mb-6 max-w-md mx-auto">We couldn't find any attractions matching your search criteria. Try adjusting your filters or search for something else.</p>
+            <a href="{% url 'attractions' %}" class="inline-flex items-center text-primary-600 hover:text-primary-800 font-medium">
+                <i class="fas fa-arrow-left mr-2"></i> Clear All Filters
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if attractions.has_other_pages %}
+    <div class="flex justify-center my-10">
+        <div class="inline-flex rounded-md shadow-sm">
+            {% if attractions.has_previous %}
+            <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.destination %}destination={{ request.GET.destination }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}page={{ attractions.previous_page_number }}" class="py-2 px-4 border border-gray-300 rounded-l-md text-sm font-medium bg-white text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500">
+                <i class="fas fa-chevron-left mr-1"></i> Previous
+            </a>
+            {% else %}
+            <span class="py-2 px-4 border border-gray-300 rounded-l-md text-sm font-medium bg-gray-100 text-gray-400 cursor-not-allowed">
+                <i class="fas fa-chevron-left mr-1"></i> Previous
+            </span>
+            {% endif %}
+
+            {% for i in attractions.paginator.page_range %}
+                {% if attractions.number == i %}
+                <span class="py-2 px-4 border border-primary-500 bg-primary-50 text-primary-600 text-sm font-medium">
+                    {{ i }}
+                </span>
+                {% elif i > attractions.number|add:'-3' and i < attractions.number|add:'3' %}
+                <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.destination %}destination={{ request.GET.destination }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}page={{ i }}" class="py-2 px-4 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 text-sm font-medium">
+                    {{ i }}
+                </a>
+                {% endif %}
+            {% endfor %}
+
+            {% if attractions.has_next %}
+            <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.destination %}destination={{ request.GET.destination }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.sort %}sort={{ request.GET.sort }}&{% endif %}page={{ attractions.next_page_number }}" class="py-2 px-4 border border-gray-300 rounded-r-md text-sm font-medium bg-white text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500">
+                Next <i class="fas fa-chevron-right ml-1"></i>
+            </a>
+            {% else %}
+            <span class="py-2 px-4 border border-gray-300 rounded-r-md text-sm font-medium bg-gray-100 text-gray-400 cursor-not-allowed">
+                Next <i class="fas fa-chevron-right ml-1"></i>
+            </span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Categories Guide -->
+<div class="max-w-6xl mx-auto mb-20">
+    <div class="text-center mb-12">
+        <span class="inline-block px-3 py-1 bg-secondary-100 text-secondary-800 rounded-full text-sm font-medium mb-2">Attraction Types</span>
+        <h2 class="text-3xl font-bold text-gray-800 mb-4">Explore by Category</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">Discover different types of attractions for every interest and preference.</p>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+        <a href="{% url 'attractions' %}?category=Landmark" class="p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition duration-300 text-center group">
+            <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary-200 transition duration-300">
+                <i class="fas fa-monument text-2xl text-primary-600"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Landmarks</h3>
+            <p class="text-gray-600">Iconic symbols and famous structures that define destinations</p>
+            <span class="mt-4 inline-block text-primary-600 hover:text-primary-800 font-medium group-hover:translate-x-1 transition-transform">
+                Explore <i class="fas fa-arrow-right ml-1 text-sm"></i>
+            </span>
+        </a>
+        <a href="{% url 'attractions' %}?category=Museum" class="p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition duration-300 text-center group">
+            <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary-200 transition duration-300">
+                <i class="fas fa-university text-2xl text-primary-600"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Museums</h3>
+            <p class="text-gray-600">Cultural institutions showcasing art, history, and science exhibits</p>
+            <span class="mt-4 inline-block text-primary-600 hover:text-primary-800 font-medium group-hover:translate-x-1 transition-transform">
+                Explore <i class="fas fa-arrow-right ml-1 text-sm"></i>
+            </span>
+        </a>
+        <a href="{% url 'attractions' %}?category=Natural Wonder" class="p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition duration-300 text-center group">
+            <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary-200 transition duration-300">
+                <i class="fas fa-mountain text-2xl text-primary-600"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Natural Wonders</h3>
+            <p class="text-gray-600">Breathtaking phenomena and spectacular landscapes formed by nature</p>
+            <span class="mt-4 inline-block text-primary-600 hover:text-primary-800 font-medium group-hover:translate-x-1 transition-transform">
+                Explore <i class="fas fa-arrow-right ml-1 text-sm"></i>
+            </span>
+        </a>
+        <a href="{% url 'attractions' %}?category=Historical Site" class="p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition duration-300 text-center group">
+            <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary-200 transition duration-300">
+                <i class="fas fa-landmark text-2xl text-primary-600"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Historical Sites</h3>
+            <p class="text-gray-600">Places of historical significance, ancient ruins, and archaeological wonders</p>
+            <span class="mt-4 inline-block text-primary-600 hover:text-primary-800 font-medium group-hover:translate-x-1 transition-transform">
+                Explore <i class="fas fa-arrow-right ml-1 text-sm"></i>
+            </span>
+        </a>
+        <a href="{% url 'attractions' %}?category=Park" class="p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition duration-300 text-center group">
+            <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary-200 transition duration-300">
+                <i class="fas fa-tree text-2xl text-primary-600"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Parks & Gardens</h3>
+            <p class="text-gray-600">Green spaces, botanical gardens, and urban parks for relaxation</p>
+            <span class="mt-4 inline-block text-primary-600 hover:text-primary-800 font-medium group-hover:translate-x-1 transition-transform">
+                Explore <i class="fas fa-arrow-right ml-1 text-sm"></i>
+            </span>
+        </a>
+        <a href="{% url 'attractions' %}?category=Entertainment" class="p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition duration-300 text-center group">
+            <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary-200 transition duration-300">
+                <i class="fas fa-ticket-alt text-2xl text-primary-600"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Entertainment</h3>
+            <p class="text-gray-600">Theme parks, theaters, and entertainment venues for family fun</p>
+            <span class="mt-4 inline-block text-primary-600 hover:text-primary-800 font-medium group-hover:translate-x-1 transition-transform">
+                Explore <i class="fas fa-arrow-right ml-1 text-sm"></i>
+            </span>
+        </a>
+    </div>
+</div>
+
+<!-- Travel Tips -->
+<div class="max-w-6xl mx-auto mb-20 gradient-accent rounded-xl overflow-hidden shadow-lg">
+    <div class="grid grid-cols-1 md:grid-cols-2 items-center">
+        <div class="p-8 md:p-12">
+            <span class="inline-block px-3 py-1 bg-white/20 text-white rounded-full text-sm font-medium mb-4">Pro Tips</span>
+            <h2 class="text-3xl font-bold text-white mb-4">Maximizing Your Attraction Visits</h2>
+            <p class="text-accent-100 mb-6">Make the most of your attraction visits with these expert tips from our travel guides.</p>
+            <ul class="space-y-4">
+                <li class="flex items-start">
+                    <span class="bg-white/20 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <i class="fas fa-clock text-white"></i>
+                    </span>
+                    <p class="ml-4 text-white">Visit popular attractions early in the morning or late in the afternoon to avoid crowds</p>
+                </li>
+                <li class="flex items-start">
+                    <span class="bg-white/20 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <i class="fas fa-ticket-alt text-white"></i>
+                    </span>
+                    <p class="ml-4 text-white">Book tickets online in advance to skip long lines at major attractions</p>
+                </li>
+                <li class="flex items-start">
+                    <span class="bg-white/20 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <i class="fas fa-mobile-alt text-white"></i>
+                    </span>
+                    <p class="ml-4 text-white">Download attraction apps for interactive maps, audio guides, and exclusive content</p>
+                </li>
+            </ul>
+            <a href="#" class="mt-6 inline-block bg-white hover:bg-gray-100 text-accent-700 font-medium py-3 px-6 rounded-lg transition duration-300 shadow-md">
+                View All Tips
+            </a>
+        </div>
+        <div class="hidden md:block relative h-full">
+            <img src="https://images.unsplash.com/photo-1527631746610-bca00a040d60?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1974&q=80" alt="Tourist taking photo" class="h-full w-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-r from-accent-700 to-transparent opacity-20"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}  {# Сохраняем скрипты из base.html, если есть #}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mapButtons = document.querySelectorAll('.open-map-btn');
+
+        mapButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const lat = parseFloat(this.dataset.lat);
+                const lng = parseFloat(this.dataset.lng);
+                const name = this.dataset.name;
+
+                if (isNaN(lat) || isNaN(lng)) {
+                    alert(`Координаты для "${name}" не найдены.`);
+                    return;
+                }
+
+                // Создаем URL для Google Maps
+                const mapUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+
+                // Открываем карту в новом окне или вкладке
+                window.open(mapUrl, '_blank');
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "tourgid/base.html" %}
+
+{% block title %}Мои путеводители{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <h1 class="mb-4">Мои сгенерированные путеводители</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if guides %}
+        <div class="list-group">
+            {% for guide in guides %}
+                <div class="list-group-item list-group-item-action flex-column align-items-start mb-2 shadow-sm rounded">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">
+                            <a href="{% url 'destination_detail' guide.destination.id %}" class="text-decoration-none">
+                                {{ guide.title|default:guide.destination.name }}
+                            </a>
+                        </h5>
+                        <small class="text-muted">Обновлен: {{ guide.updated_at|date:"d.m.Y H:i" }}</small>
+                    </div>
+                    <p class="mb-1 text-muted">Направление: {{ guide.destination.name }}, {{ guide.destination.country }}</p>
+
+                    {# Проверяем наличие файла #}
+                    {% if guide.pdf_file %}
+                        <a href="{{ guide.pdf_file.url }}" class="btn btn-success mt-2" target="_blank" download>
+                            <i class="fas fa-download mr-1"></i> Скачать PDF
+                        </a>
+                    {% else %}
+                        <button class="btn btn-secondary mt-2" disabled>
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Генерируется...
+                        </button>
+                        {# Можно добавить JS для автообновления статуса через некоторое время #}
+                    {% endif %}
+                     {# Кнопка для повторной генерации (если нужно) #}
+                     <a href="{% url 'trigger_guide_generation' guide.destination.id %}" class="btn btn-outline-primary mt-2 ms-2" title="Перегенерировать путеводитель">
+                         <i class="fas fa-sync-alt"></i>
+                     </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>У вас пока нет сгенерированных путеводителей.</p>
+        <p><a href="{% url 'destinations' %}">Выберите направление</a>, чтобы сгенерировать свой первый путеводитель!</p>
+    {% endif %}
+</div>
+{% endblock %}
